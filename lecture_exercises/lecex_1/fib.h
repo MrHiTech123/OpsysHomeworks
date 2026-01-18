@@ -17,11 +17,6 @@ unsigned int fib(unsigned int n) {
 }
 
 
-
-char* readFileToString(char* fileName) {
-	return NULL;
-}
-
 bool contains(const char* haystack, const char needle) {
 	for (
 		const char* partOfHaystackBeingChecked = haystack; 
@@ -42,11 +37,14 @@ int lengthOfFileBytes(FILE* file) {
 	return toReturn;
 }
 
-char* mallocAndReadFile(const char* fileName) {
+char* mallocAndReadFileContents(const char* fileName) {
 	FILE* stream = fopen(fileName, "r");
-	char* fileContents = (char*)malloc(lengthOfFileBytes(stream) * sizeof(char));
-	fread(fileContents, 1, SIZE_MAX, stream);
+	int fileSize = lengthOfFileBytes(stream);
+	char* fileContents = (char*)malloc((fileSize + 1) * sizeof(char));
+	fread(fileContents, 1, fileSize, stream);
 	fclose(stream);
+	
+	*(fileContents + fileSize) = '\0';
 	return fileContents;
 }
 
@@ -81,7 +79,7 @@ int isFib(int numToTest) {
 
 
 int filter(const char* filename, const char* skip) {
-	char* fileContents = mallocAndReadFile(filename);
+	char* fileContents = mallocAndReadFileContents(filename);
 	int removedChars = removeAllChars(fileContents, skip);
 	printf("%s\n", fileContents);
 	free(fileContents);
