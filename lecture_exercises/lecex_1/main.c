@@ -21,6 +21,10 @@ int main() {
 		printf("%d %d\n", i, current);
 	}
 	
+	char myAlsoWord[] = "My password is: 1233";
+	removeAllChars(myAlsoWord, "pass3");
+	printf("%s\n", myAlsoWord);
+	
 	return 0;
 }
 
