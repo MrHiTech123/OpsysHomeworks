@@ -30,15 +30,16 @@ char* callocFileContentsBuffer(const char* fileName) {
 int main(int argc, char const *argv[])
 {
 	if (argc == 1) {
-		printf("Usage hw1 tokenfile [maxTokenLength]");
+		printf("Usage hw1 tokenfile [maxTokenLength]\n");
+		return 1;
 	}
 	if (argc == 2) {
-		char const ** nextArgv = calloc(3, sizeof(char*));
-		*(nextArgv + 1) = *(argv);
+		char const** nextArgv = calloc(3, sizeof(char*));
+		*(nextArgv + 1) = *(argv + 1);
 		*(nextArgv + 2) = "100";
 		
 		int toReturn = main(
-			2,
+			3,
 			nextArgv
 		);
 		
