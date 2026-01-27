@@ -5,6 +5,31 @@
 
 typedef char** TokenHolder;
 
+typedef enum {
+	CALLOC, REALLOC
+} AllocationType;
+
+const char* allocationTypeToString(AllocationType type) {
+	switch (type) {
+		case CALLOC:
+			return "calloc";
+		case REALLOC:
+			return "realloc";
+		default:
+			return NULL;
+	};
+}
+
+void allocateString() {
+	
+}
+
+
+typedef struct {
+	char* memoryPointer
+	
+	
+} AllocatedString;
 
 int fileLength(FILE* file) {
 	fseek(file, 0, SEEK_END);
@@ -83,11 +108,6 @@ TokenHolder callocAndMakeTokenHolder(
 		
 		while (*(currentChar + tokenLength) && !isspace(*(currentChar + tokenLength))) {
 			++tokenLength;
-			char* tempToken = malloc(tokenLength + 1);
-			strncpy(tempToken, currentChar, tokenLength);
-			printf("%s\n", tempToken);
-			fflush(stdout);
-			free(tempToken);
 		}
 		
 		addToken(toReturn, currentChar, tokenLength);
