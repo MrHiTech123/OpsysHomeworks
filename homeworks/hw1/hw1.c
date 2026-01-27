@@ -5,32 +5,6 @@
 
 typedef char** TokenHolder;
 
-typedef enum {
-	CALLOC, REALLOC
-} AllocationType;
-
-const char* allocationTypeToString(AllocationType type) {
-	switch (type) {
-		case CALLOC:
-			return "calloc";
-		case REALLOC:
-			return "realloc";
-		default:
-			return NULL;
-	};
-}
-
-void allocateString() {
-	
-}
-
-
-typedef struct {
-	char* memoryPointer
-	
-	
-} AllocatedString;
-
 int fileLength(FILE* file) {
 	fseek(file, 0, SEEK_END);
 	int toReturn = ftell(file);
@@ -72,18 +46,33 @@ void addToken(TokenHolder tokenHolder, char* token, int tokenLength) {
 	
 	char** pointerToTokenStringToAppendTo = tokenHolder + tokenLength - 1;
 	
+	char* nullTerminatedToken = calloc(tokenLength + 1, sizeof(char));
+	strncpy(nullTerminatedToken, token, tokenLength);
+	
+	
+	
 	if (*pointerToTokenStringToAppendTo == NULL) {
 		*pointerToTokenStringToAppendTo = calloc(tokenLength + 2, sizeof(char));
 	}
 	else {
+		int holderAlreadyHasWord = strstr(*pointerToTokenStringToAppendTo, nullTerminatedToken) != NULL;
+		if (holderAlreadyHasWord) {
+			return;
+		}
+		
 		*pointerToTokenStringToAppendTo = realloc(
 			*pointerToTokenStringToAppendTo,
 			strlen(*pointerToTokenStringToAppendTo) + tokenLength + 2
 		);
 	}
 	
-	strncat(*pointerToTokenStringToAppendTo, token, tokenLength);
+	
+	
+	
+	strcat(*pointerToTokenStringToAppendTo, nullTerminatedToken);
 	strcat(*pointerToTokenStringToAppendTo, "\n");
+	
+	free(nullTerminatedToken);
 	
 }
 
@@ -109,6 +98,7 @@ TokenHolder callocAndMakeTokenHolder(
 		while (*(currentChar + tokenLength) && !isspace(*(currentChar + tokenLength))) {
 			++tokenLength;
 		}
+		
 		
 		addToken(toReturn, currentChar, tokenLength);
 		currentChar += tokenLength;
