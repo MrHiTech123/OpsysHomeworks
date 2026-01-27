@@ -1,6 +1,9 @@
+#include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <ctype.h>
 
+typedef char** TokenHolder;
 
 
 int fileLength(FILE* file) {
@@ -25,6 +28,78 @@ char* callocFileContentsBuffer(const char* fileName) {
 	
 }
 
+char* appendString(char* originalString, char* toAppend) {
+	char* toReturn = realloc(
+		originalString,
+		strlen(originalString) + strlen(toAppend) + 1
+	);
+	
+	strcat(toReturn, toAppend);
+	
+	return toReturn;
+}
+
+
+
+
+void addToken(TokenHolder tokenHolder, char* token, int tokenLength) {
+	if (!tokenLength) return;
+	
+	char** pointerToTokenStringToAppendTo = tokenHolder + tokenLength - 1;
+	
+	if (*pointerToTokenStringToAppendTo == NULL) {
+		*pointerToTokenStringToAppendTo = calloc(tokenLength + 2, sizeof(char));
+	}
+	else {
+		*pointerToTokenStringToAppendTo = realloc(
+			*pointerToTokenStringToAppendTo,
+			strlen(*pointerToTokenStringToAppendTo) + tokenLength + 2
+		);
+	}
+	
+	strncat(*pointerToTokenStringToAppendTo, token, tokenLength);
+	strcat(*pointerToTokenStringToAppendTo, "\n");
+	
+}
+
+TokenHolder callocAndMakeTokenHolder(
+	char* fileContents,
+	int longestPossibleToken
+) {
+	TokenHolder toReturn = calloc(
+		longestPossibleToken,
+		sizeof(char*)
+	);
+	
+	
+	for (
+		char* currentChar = fileContents;
+		*(currentChar);
+		++currentChar
+	) {
+		
+		int tokenLength = 0;
+		
+		
+		while (*(currentChar + tokenLength) && !isspace(*(currentChar + tokenLength))) {
+			++tokenLength;
+			char* tempToken = malloc(tokenLength + 1);
+			strncpy(tempToken, currentChar, tokenLength);
+			printf("%s\n", tempToken);
+			fflush(stdout);
+			free(tempToken);
+		}
+		
+		addToken(toReturn, currentChar, tokenLength);
+		currentChar += tokenLength;
+		
+	}
+	
+	return toReturn;
+}
+
+
+
 
 
 int main(int argc, char const *argv[])
@@ -35,24 +110,44 @@ int main(int argc, char const *argv[])
 	}
 	if (argc == 2) {
 		char const** nextArgv = calloc(3, sizeof(char*));
+		*(nextArgv) = *argv;
 		*(nextArgv + 1) = *(argv + 1);
 		*(nextArgv + 2) = "100";
 		
-		int toReturn = main(
-			3,
-			nextArgv
-		);
+		int toReturn = main(3, nextArgv);
 		
 		free(nextArgv);
 		return toReturn;
 	}
 	
-	char* fileContents = callocFileContentsBuffer(*(argv + 1));
+	const char* fileName = *(argv + 1);
+	const int longestPossibleToken = atoi(*(argv + 2));
 	
-	printf("%s\n", argv[1]);
-	printf("%s\n", fileContents);
+	char* fileContents = callocFileContentsBuffer(fileName);
+	
+	TokenHolder tokenHolder = callocAndMakeTokenHolder(
+		fileContents,
+		longestPossibleToken
+	);
+	
+	for (int i = 0; i < longestPossibleToken; ++i) {
+		if (*(tokenHolder + i)) {
+			printf("%s\n", *(tokenHolder + i));
+		}
+	}
+	
+	
+	// printf("%s\n", fileContents);
+	
+	for (int i = 0; i < longestPossibleToken; ++i) {
+		if (*(tokenHolder + i)) {
+			free(*(tokenHolder + i));
+		}
+	}
+	free(tokenHolder);
 	
 	free(fileContents);
+	
 	
 	
 	
