@@ -18,6 +18,21 @@
 
 typedef char** TokenHolder;
 
+typedef enum {
+	CALLOC,
+	REALLOC
+} AllocationType;
+
+char* AllocationType_toString(AllocationType type) {
+	switch (type) {
+		case CALLOC:
+			return "calloc";
+		case REALLOC:
+			return "realloc";
+	}
+	return "ERROR";
+}
+
 char* appendString(char* originalString, char* toAppend) {
 	char* toReturn = realloc(
 		originalString,
@@ -38,10 +53,11 @@ void addToken(TokenHolder tokenHolder, char* token) {
 	if (!tokenLength) return;
 	
 	char** pointerToTokenStringToAppendTo = tokenHolder + tokenLength - 1;
-	
+	AllocationType howMemoryWasAllocatedHere;
 	
 	if (*pointerToTokenStringToAppendTo == NULL) {
 		*pointerToTokenStringToAppendTo = calloc(tokenLength + 2, sizeof(char));
+		howMemoryWasAllocatedHere = CALLOC;
 	}
 	else {
 		int holderAlreadyHasWord = strstr(*pointerToTokenStringToAppendTo, token) != NULL;
@@ -53,13 +69,13 @@ void addToken(TokenHolder tokenHolder, char* token) {
 			*pointerToTokenStringToAppendTo,
 			strlen(*pointerToTokenStringToAppendTo) + tokenLength + 2
 		);
+		howMemoryWasAllocatedHere = REALLOC;
 	}
-	
-	
-	
 	
 	strcat(*pointerToTokenStringToAppendTo, token);
 	strcat(*pointerToTokenStringToAppendTo, "\n");
+	
+	printf("%s (length %d) (%s)\n", token, tokenLength, AllocationType_toString(howMemoryWasAllocatedHere));
 	
 }
 
@@ -89,7 +105,6 @@ TokenHolder callocAndMakeTokenHolder(
 		
 		if (isspace(*(buffer + currentTokenLength))) {
 			*(buffer + currentTokenLength) = '\0';
-			printf("%s\n", buffer);
 			addToken(toReturn, buffer);
 			currentTokenLength = -1;
 		}
@@ -121,6 +136,8 @@ TokenHolder callocAndMakeTokenHolder(
 	// 	currentChar += tokenLength;
 		
 	// }
+	
+	free(buffer);
 	
 	return toReturn;
 }
