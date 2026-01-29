@@ -15,12 +15,15 @@
 #include <fcntl.h>
 #endif
 
+const char OPEN_BRACKET = 91;
+const char CLOSED_BRACKET = 93;
 
 typedef char** TokenHolder;
 
 typedef enum {
 	CALLOC,
-	REALLOC
+	REALLOC,
+	DUPLICATE
 } AllocationType;
 
 char* AllocationType_toString(AllocationType type) {
@@ -29,6 +32,8 @@ char* AllocationType_toString(AllocationType type) {
 			return "calloc";
 		case REALLOC:
 			return "realloc";
+		case DUPLICATE:
+			return "duplicate";
 	}
 	return "ERROR";
 }
@@ -52,6 +57,8 @@ void addToken(TokenHolder tokenHolder, char* token) {
 	
 	if (!tokenLength) return;
 	
+	int holderAlreadyHasWord = 0;
+	
 	char** pointerToTokenStringToAppendTo = tokenHolder + tokenLength - 1;
 	AllocationType howMemoryWasAllocatedHere;
 	
@@ -60,22 +67,31 @@ void addToken(TokenHolder tokenHolder, char* token) {
 		howMemoryWasAllocatedHere = CALLOC;
 	}
 	else {
-		int holderAlreadyHasWord = strstr(*pointerToTokenStringToAppendTo, token) != NULL;
-		if (holderAlreadyHasWord) {
-			return;
-		}
+		holderAlreadyHasWord = strstr(*pointerToTokenStringToAppendTo, token) != NULL;
+		
 		
 		*pointerToTokenStringToAppendTo = realloc(
 			*pointerToTokenStringToAppendTo,
 			strlen(*pointerToTokenStringToAppendTo) + tokenLength + 2
 		);
-		howMemoryWasAllocatedHere = REALLOC;
+		
+		if (holderAlreadyHasWord) {
+			howMemoryWasAllocatedHere = DUPLICATE;
+		}
+		else {
+			howMemoryWasAllocatedHere = REALLOC;
+		}
+	}
+	
+	printf("%s (length %d) (%s)\n", token, tokenLength, AllocationType_toString(howMemoryWasAllocatedHere));
+	
+	if (holderAlreadyHasWord) {
+		return;
 	}
 	
 	strcat(*pointerToTokenStringToAppendTo, token);
 	strcat(*pointerToTokenStringToAppendTo, "\n");
 	
-	printf("%s (length %d) (%s)\n", token, tokenLength, AllocationType_toString(howMemoryWasAllocatedHere));
 	
 }
 
@@ -116,32 +132,15 @@ TokenHolder callocAndMakeTokenHolder(
 		
 	}
 	
-	
-	
-	// for (
-	// 	char* currentChar = fileContents;
-	// 	*(currentChar);
-	// 	++currentChar
-	// ) {
-		
-	// 	int tokenLength = 0;
-		
-		
-	// 	while (*(currentChar + tokenLength) && !isspace(*(currentChar + tokenLength))) {
-	// 		++tokenLength;
-	// 	}
-		
-		
-	// 	addToken(toReturn, currentChar, tokenLength);
-	// 	currentChar += tokenLength;
-		
-	// }
-	
 	free(buffer);
+	printf("\n");
 	
 	return toReturn;
 }
 
+void printPhraseTokensAtIndex(int index) {
+	printf("Tokens at index %c%d%c:\n", OPEN_BRACKET, index, CLOSED_BRACKET);
+}
 
 
 
@@ -176,6 +175,7 @@ int main(int argc, char const *argv[])
 	
 	for (int i = 0; i < maxTokenLength; ++i) {
 		if (*(tokenHolder + i)) {
+			printPhraseTokensAtIndex(i + 1);
 			printf("%s\n", *(tokenHolder + i));
 		}
 	}
