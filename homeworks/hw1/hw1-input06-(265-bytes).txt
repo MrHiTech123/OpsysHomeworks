@@ -1,0 +1,6 @@
+let it snow so we have a snow day !!
+
+Store each token with a newline '\n' on the end, so the stored string grows as necessary; for
+example, given this paragraph of text, we would have the following string at index 5:
+
+Do not use malloc() or memset() in your code.

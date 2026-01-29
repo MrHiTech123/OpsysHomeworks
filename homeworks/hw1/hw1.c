@@ -26,12 +26,62 @@ typedef enum {
 	DUPLICATE
 } AllocationType;
 
-int largestTokenLengthInFile(char* fileName) {
-	return 100;
+int largestTokenLengthInFile(const char* fileName) {
+	int fileHandle = open(fileName, 0);
+	if (fileHandle < 0) {
+		return -1;
+	}
+	
+	int current = 0;
+	int longest = 0;
+	
+	char currentChar = 0;
+	int charactersRead = 100;
+	while (charactersRead) {
+		charactersRead = read(fileHandle, &currentChar, 1);
+		if (isspace(currentChar)) {
+			if (current > longest) {
+				longest = current;
+			}
+			current = 0;
+		}
+		else {
+			++current;
+		}
+	}
+	
+	return longest;
+	
+	
+	
+}
+
+int logBase10RoundedUp(const int n) {
+	int toReturn = 0;
+	int total = 1;
+	while (total < n) {
+		toReturn += 1;
+		total *= 10;
+	}
+	return toReturn;
+}
+
+char* callocIToA(int i) {
+	char* toReturn = calloc(logBase10RoundedUp(i) + 1, sizeof(char));
+	sprintf(toReturn, "%d", i);
+	return toReturn;
+}
+
+char* callocAndStringifiedLongestTokenInFile(const char* fileName) {
+	int longest = largestTokenLengthInFile(fileName);
+	if (longest == -1) {
+		return NULL;
+	}
+	return callocIToA(longest);
 }
 
 
-char* AllocationType_toString(AllocationType type) {
+char* AllocationType_toString(const AllocationType type) {
 	switch (type) {
 		case CALLOC:
 			return "calloc";
@@ -43,7 +93,7 @@ char* AllocationType_toString(AllocationType type) {
 	return "ERROR";
 }
 
-char* appendString(char* originalString, char* toAppend) {
+char* appendString(char* originalString, const char* toAppend) {
 	char* toReturn = realloc(
 		originalString,
 		strlen(originalString) + strlen(toAppend) + 1
@@ -57,7 +107,7 @@ char* appendString(char* originalString, char* toAppend) {
 
 
 
-void addToken(TokenHolder tokenHolder, char* token) {
+void addToken(TokenHolder tokenHolder, const char* token) {
 	int tokenLength = strlen(token);
 	
 	if (!tokenLength) return;
@@ -102,8 +152,8 @@ void addToken(TokenHolder tokenHolder, char* token) {
 
 
 TokenHolder callocAndMakeTokenHolder(
-	int fileDescriptor,
-	int maxTokenLength
+	const int fileHandle,
+	const int maxTokenLength
 ) {
 	TokenHolder toReturn = calloc(
 		maxTokenLength,
@@ -118,15 +168,15 @@ TokenHolder callocAndMakeTokenHolder(
 		
 		if (currentTokenLength > maxTokenLength) {
 			while (1) {
-				read(fileDescriptor, buffer, 1);
-				if (isspace(*buffer)) {
+				int bytesRead = read(fileHandle, buffer, 1);
+				if (!bytesRead || isspace(*buffer)) {
 					currentTokenLength = 0;
 					break;
 				}
 			}
 		}
 		
-		int bytesRead = read(fileDescriptor, buffer + currentTokenLength, 1);
+		int bytesRead = read(fileHandle, buffer + currentTokenLength, 1);
 		
 		
 		if (isspace(*(buffer + currentTokenLength)) || !bytesRead) {
@@ -144,30 +194,38 @@ TokenHolder callocAndMakeTokenHolder(
 		
 	}
 	
-	free(buffer);
-	printf("\n");
-	
+	free(buffer);	
 	return toReturn;
 }
 
-void printPhraseTokensAtIndex(int index) {
+void printPhraseTokensAtIndex(const int index) {
 	printf("Tokens at index %c%d%c:\n", OPEN_BRACKET, index, CLOSED_BRACKET);
 }
 
+void printFileDoesntExistError(const char* fileName) {
+	fprintf(stderr, "ERROR: Invalid file %s\n", fileName);
+}
 
 
-
-int main(int argc, char const *argv[])
+int main(int argc, char const** argv)
 {
 	if (argc == 1) {
-		printf("Usage hw1 tokenfile [maxTokenLength]\n");
+		printf("ERROR: Usage hw1 tokenfile [maxTokenLength]\n");
 		return 1;
 	}
 	if (argc == 2) {
 		char const** nextArgv = calloc(3, sizeof(char*));
 		*(nextArgv) = *argv;
 		*(nextArgv + 1) = *(argv + 1);
-		*(nextArgv + 2) = "100";
+		
+		char* longestTokenArg = callocAndStringifiedLongestTokenInFile(*(argv + 1));
+		
+		if (longestTokenArg == NULL) {
+			printFileDoesntExistError(*(argv + 1));
+			return 1;
+		}
+		
+		*(nextArgv + 2) = longestTokenArg;
 		
 		// int largestTokenLength = largestTokenLengthInFile(*(argv + 1));
 		
@@ -175,37 +233,47 @@ int main(int argc, char const *argv[])
 		
 		int toReturn = main(3, nextArgv);
 		
+		free(longestTokenArg);
 		free(nextArgv);
 		return toReturn;
 	}
 	
 	const char* fileName = *(argv + 1);
 	const int maxTokenLength = atoi(*(argv + 2));
+		
+	if (maxTokenLength <= 0) {
+		fprintf(stderr, "ERROR: entered maximum length was 0 or negative.\n");
+		return 1;
+	}
 	
-	int fileDescriptor = open(fileName, 0, "r");
+	int fileHandle = open(fileName, 0);
+	
+	if (fileHandle < 0) {
+		printFileDoesntExistError(fileName);
+		return 1;
+	}
 	
 	TokenHolder tokenHolder = callocAndMakeTokenHolder(
-		fileDescriptor,
+		fileHandle,
 		maxTokenLength
 	);
 	
 	for (int i = 0; i < maxTokenLength; ++i) {
 		if (*(tokenHolder + i)) {
+			printf("\n");
 			printPhraseTokensAtIndex(i + 1);
-			printf("%s\n", *(tokenHolder + i));
+			printf("%s", *(tokenHolder + i));
 		}
 	}
-	
-	
-	// printf("%s\n", fileContents);
-	
+		
+		
 	for (int i = 0; i < maxTokenLength; ++i) {
 		if (*(tokenHolder + i)) {
 			free(*(tokenHolder + i));
 		}
 	}
 	
-	close(fileDescriptor);
+	close(fileHandle);
 	
 	free(tokenHolder);
 		

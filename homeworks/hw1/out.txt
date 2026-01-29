@@ -1,0 +1,29 @@
+Hello (length 5) (calloc)
+world (length 5) (realloc)
+How (length 3) (calloc)
+are (length 3) (realloc)
+you (length 3) (realloc)
+today? (length 6) (calloc)
+how (length 3) (realloc)
+how (length 3) (duplicate)
+how (length 3) (duplicate)
+Howie (length 5) (realloc)
+how (length 3) (duplicate)
+How1..10000 (length 11) (calloc)
+
+Tokens at index [3]:
+How
+are
+you
+how
+
+Tokens at index [5]:
+Hello
+world
+Howie
+
+Tokens at index [6]:
+today?
+
+Tokens at index [11]:
+How1..10000
