@@ -26,6 +26,11 @@ typedef enum {
 	DUPLICATE
 } AllocationType;
 
+int largestTokenLengthInFile(char* fileName) {
+	return 100;
+}
+
+
 char* AllocationType_toString(AllocationType type) {
 	switch (type) {
 		case CALLOC:
@@ -112,7 +117,13 @@ TokenHolder callocAndMakeTokenHolder(
 	while (1) {
 		
 		if (currentTokenLength > maxTokenLength) {
-			// Go to end of token
+			while (1) {
+				read(fileDescriptor, buffer, 1);
+				if (isspace(*buffer)) {
+					currentTokenLength = 0;
+					break;
+				}
+			}
 		}
 		
 		int bytesRead = read(fileDescriptor, buffer + currentTokenLength, 1);
@@ -157,6 +168,10 @@ int main(int argc, char const *argv[])
 		*(nextArgv) = *argv;
 		*(nextArgv + 1) = *(argv + 1);
 		*(nextArgv + 2) = "100";
+		
+		// int largestTokenLength = largestTokenLengthInFile(*(argv + 1));
+		
+		// sprintf(*(nextArgv + 2), "%d", )
 		
 		int toReturn = main(3, nextArgv);
 		
