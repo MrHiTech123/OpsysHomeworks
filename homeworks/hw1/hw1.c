@@ -3,29 +3,20 @@
 #include <stdio.h>
 #include <ctype.h>
 
+
+// Taken from https://stackoverflow.com/questions/22705751/cannot-open-include-file-unistd-h-no-such-file-or-directory
+// Replaces the line #include <unistd.h>
+#ifdef _WIN32
+#include <io.h>
+#define access _access
+
+#else
+#include <unistd.h>
+#include <fcntl.h>
+#endif
+
+
 typedef char** TokenHolder;
-
-int fileLength(FILE* file) {
-	fseek(file, 0, SEEK_END);
-	int toReturn = ftell(file);
-	rewind(file);
-	return toReturn;
-}
-
-char* callocFileContentsBuffer(const char* fileName) {
-	FILE* file = fopen(fileName, "r");
-	int length = fileLength(file);
-	printf("%d\n", length);
-	
-	
-	char* toReturn = calloc(length + 1, sizeof(char));
-	fread(toReturn, sizeof(char), length, file);
-	fclose(file);
-	*(toReturn + length) = '\0';
-	
-	return toReturn;
-	
-}
 
 char* appendString(char* originalString, char* toAppend) {
 	char* toReturn = realloc(
@@ -41,21 +32,19 @@ char* appendString(char* originalString, char* toAppend) {
 
 
 
-void addToken(TokenHolder tokenHolder, char* token, int tokenLength) {
+void addToken(TokenHolder tokenHolder, char* token) {
+	int tokenLength = strlen(token);
+	
 	if (!tokenLength) return;
 	
 	char** pointerToTokenStringToAppendTo = tokenHolder + tokenLength - 1;
-	
-	char* nullTerminatedToken = calloc(tokenLength + 1, sizeof(char));
-	strncpy(nullTerminatedToken, token, tokenLength);
-	
 	
 	
 	if (*pointerToTokenStringToAppendTo == NULL) {
 		*pointerToTokenStringToAppendTo = calloc(tokenLength + 2, sizeof(char));
 	}
 	else {
-		int holderAlreadyHasWord = strstr(*pointerToTokenStringToAppendTo, nullTerminatedToken) != NULL;
+		int holderAlreadyHasWord = strstr(*pointerToTokenStringToAppendTo, token) != NULL;
 		if (holderAlreadyHasWord) {
 			return;
 		}
@@ -69,41 +58,69 @@ void addToken(TokenHolder tokenHolder, char* token, int tokenLength) {
 	
 	
 	
-	strcat(*pointerToTokenStringToAppendTo, nullTerminatedToken);
+	strcat(*pointerToTokenStringToAppendTo, token);
 	strcat(*pointerToTokenStringToAppendTo, "\n");
-	
-	free(nullTerminatedToken);
 	
 }
 
+
 TokenHolder callocAndMakeTokenHolder(
-	char* fileContents,
-	int longestPossibleToken
+	int fileDescriptor,
+	int maxTokenLength
 ) {
 	TokenHolder toReturn = calloc(
-		longestPossibleToken,
+		maxTokenLength,
 		sizeof(char*)
 	);
 	
+	char* buffer = calloc(maxTokenLength + 1, sizeof(char));
 	
-	for (
-		char* currentChar = fileContents;
-		*(currentChar);
-		++currentChar
-	) {
+	int currentTokenLength = 0;
+	
+	while (1) {
 		
-		int tokenLength = 0;
+		if (currentTokenLength > maxTokenLength) {
+			// Go to end of token
+		}
 		
+		int bytesRead = read(fileDescriptor, buffer + currentTokenLength, 1);
 		
-		while (*(currentChar + tokenLength) && !isspace(*(currentChar + tokenLength))) {
-			++tokenLength;
+		if (!bytesRead) break;
+		
+		if (isspace(*(buffer + currentTokenLength))) {
+			*(buffer + currentTokenLength) = '\0';
+			printf("%s\n", buffer);
+			addToken(toReturn, buffer);
+			currentTokenLength = -1;
 		}
 		
 		
-		addToken(toReturn, currentChar, tokenLength);
-		currentChar += tokenLength;
+		
+		++currentTokenLength;
+		
 		
 	}
+	
+	
+	
+	// for (
+	// 	char* currentChar = fileContents;
+	// 	*(currentChar);
+	// 	++currentChar
+	// ) {
+		
+	// 	int tokenLength = 0;
+		
+		
+	// 	while (*(currentChar + tokenLength) && !isspace(*(currentChar + tokenLength))) {
+	// 		++tokenLength;
+	// 	}
+		
+		
+	// 	addToken(toReturn, currentChar, tokenLength);
+	// 	currentChar += tokenLength;
+		
+	// }
 	
 	return toReturn;
 }
@@ -131,16 +148,16 @@ int main(int argc, char const *argv[])
 	}
 	
 	const char* fileName = *(argv + 1);
-	const int longestPossibleToken = atoi(*(argv + 2));
+	const int maxTokenLength = atoi(*(argv + 2));
 	
-	char* fileContents = callocFileContentsBuffer(fileName);
+	int fileDescriptor = open(fileName, 0, "r");
 	
 	TokenHolder tokenHolder = callocAndMakeTokenHolder(
-		fileContents,
-		longestPossibleToken
+		fileDescriptor,
+		maxTokenLength
 	);
 	
-	for (int i = 0; i < longestPossibleToken; ++i) {
+	for (int i = 0; i < maxTokenLength; ++i) {
 		if (*(tokenHolder + i)) {
 			printf("%s\n", *(tokenHolder + i));
 		}
@@ -149,15 +166,16 @@ int main(int argc, char const *argv[])
 	
 	// printf("%s\n", fileContents);
 	
-	for (int i = 0; i < longestPossibleToken; ++i) {
+	for (int i = 0; i < maxTokenLength; ++i) {
 		if (*(tokenHolder + i)) {
 			free(*(tokenHolder + i));
 		}
 	}
+	
+	close(fileDescriptor);
+	
 	free(tokenHolder);
-	
-	free(fileContents);
-	
+		
 	
 	
 	
