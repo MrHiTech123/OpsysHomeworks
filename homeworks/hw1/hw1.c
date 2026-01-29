@@ -117,14 +117,15 @@ TokenHolder callocAndMakeTokenHolder(
 		
 		int bytesRead = read(fileDescriptor, buffer + currentTokenLength, 1);
 		
-		if (!bytesRead) break;
 		
-		if (isspace(*(buffer + currentTokenLength))) {
+		if (isspace(*(buffer + currentTokenLength)) || !bytesRead) {
 			*(buffer + currentTokenLength) = '\0';
 			addToken(toReturn, buffer);
 			currentTokenLength = -1;
 		}
 		
+		
+		if (!bytesRead) break;
 		
 		
 		++currentTokenLength;
