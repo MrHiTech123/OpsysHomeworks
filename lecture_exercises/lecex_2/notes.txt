@@ -1,0 +1,90 @@
+[01/29/2026]
+
+ BEFORE: PROCESS (executable a.out in memory)
+
+ +-----------------------------+
+ | runtime heap                |
+ |      | XXXXXX..XXX (128)    |  <== this is example heap memory
+ |      |   LAKERS0..........  |       from dynamic memory allocations
+ |      |  LAKERS0ZZZZZZZZ     |        (from last weeks' examples)
+ |      v                      |
+ |                             |
+ |      ^                      |
+ |      |----------------------|
+ |      |fork()                |
+ |      |----------------------|
+ |      |main()                |
+ |      | int x: 22            |
+ |      | char * s: <addr>     |
+ |      | pid_t p              |
+ |      |----------------------|
+ | runtime stack               |
+ |-----------------------------|
+ | code/data/text segments     |
+ | [read-only memory]          |
+ | <addr>: "BREEZE\0"          |
+ +-----------------------------+
+
+
+ AFTER the fork() call:
+ TWO PROCESSes (two executable a.out processes in memory)
+
+  all memory for the PARENT process is effectively duplicated
+   in the CHILD process...             ^^^^^^^^^^^
+
+
+ <parent (orig)>                   <child (new)>
+ +-----------------------------+   +-----------------------------+
+ | runtime heap                |   | runtime heap                |
+ |      | XXXXXX..XXX (128)    |   |      | XXXXXX..XXX (128)    |
+ |      |   LAKERS0..........  |   |      |   LAKERS0..........  |
+ |      |  LAKERS0ZZZZZZZZ     |   |      |  LAKERS0ZZZZZZZZ     |
+ |      v                      |   |      v                      |
+ |                             |   |                             |
+ |      ^                      |   |      ^                      |
+ |      |----------------------|   |      |----------------------|
+ |      |fork()                |   |      |fork()                |
+ |      |----------------------|   |      |----------------------|
+ |      |main()                |   |      |main()                |
+ |      | int x: 22            |   |      | int x: 22            |
+ |      | char * s: <addr>     |   |      | char * s: <addr>     |
+ |      | pid_t p              |   |      | pid_t p              |
+ |      |----------------------|   |      |----------------------|
+ | runtime stack               |   | runtime stack               |
+ |-----------------------------|   |-----------------------------|
+ | code/data/text segments     |   | code/data/text segments     |
+ | [read-only memory]          |   | [read-only memory]          |
+ | <addr>: "BREEZE\0"          |   | <addr>: "BREEZE\0"          |
+ +-----------------------------+   +-----------------------------+
+
+
+
+
+
+
+
+
+     POP QUIZ #1 ---- 15 minutes ---------------------------
+
+
+
+     CLARIFICATION:  Q3 -- cross out this answer (it is incorrect):
+
+            The original process creates a child process and blocks
+             until this new process terminates
+
+
+
+
+
+     POP QUIZ #1 ---- 15 minutes ---------------------------
+
+                  ...but you can stay until 11:50AM (today)
+
+                                     everyone must stay until 11:37AM
+                                                              (today)
+                                                                  |
+                                                                  |
+                                                                  |
+                                                                  |
+                                                                  v
