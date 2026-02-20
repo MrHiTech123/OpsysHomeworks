@@ -1,0 +1,7 @@
+*** Solving the Wazir tour problem (2x2 board)
+*** NO_PARALLEL mode
+*** Start at row 0 and column 0 (move #1)
+*** Detected 2 possible moves after move #1; creating 2 child processes
+*** Found a closed Wazir tour at move #4; notifying top-level parent
+*** Found a closed Wazir tour at move #4; notifying top-level parent
+*** Search complete; found 0 open tours and 2 closed tours

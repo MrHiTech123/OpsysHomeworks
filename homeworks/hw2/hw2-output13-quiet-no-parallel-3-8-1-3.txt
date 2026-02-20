@@ -1,0 +1,4 @@
+*** Solving the Wazir tour problem (3x8 board)
+*** NO_PARALLEL and QUIET mode
+*** Start at row 1 and column 3 (move #1)
+*** Search complete; found 116 open tours and 16 closed tours

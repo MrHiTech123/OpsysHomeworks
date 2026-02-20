@@ -1,0 +1,17 @@
+*** Solving the Wazir tour problem (3x3 board)
+*** PARALLEL mode
+*** Start at row 1 and column 1 (move #1)
+*** Detected 4 possible moves after move #1; creating 4 child processes
+*** Detected 2 possible moves after move #2; creating 2 child processes
+*** Detected 2 possible moves after move #2; creating 2 child processes
+*** Detected 2 possible moves after move #2; creating 2 child processes
+*** Found an open Wazir tour at move #9; notifying top-level parent
+*** Found an open Wazir tour at move #9; notifying top-level parent
+*** Found an open Wazir tour at move #9; notifying top-level parent
+*** Found an open Wazir tour at move #9; notifying top-level parent
+*** Found an open Wazir tour at move #9; notifying top-level parent
+*** Found an open Wazir tour at move #9; notifying top-level parent
+*** Detected 2 possible moves after move #2; creating 2 child processes
+*** Found an open Wazir tour at move #9; notifying top-level parent
+*** Found an open Wazir tour at move #9; notifying top-level parent
+*** Search complete; found 8 open tours and 0 closed tours
