@@ -39,10 +39,13 @@ typedef struct {
 	bool** visited;
 	int numRows;
 	int numCols;
-} Board;
+} BoardData;
 
-Board* Board_createAndAllocate(int numRows, int numCols) {
-	Board* toReturn = calloc(1, sizeof(Board));
+typedef BoardData* Board;
+
+
+Board Board_createAndAllocate(int numRows, int numCols) {
+	Board toReturn = calloc(1, sizeof(BoardData));
 	toReturn->numRows = numRows;
 	toReturn->numCols = numCols;
 	
@@ -54,7 +57,11 @@ Board* Board_createAndAllocate(int numRows, int numCols) {
 	return toReturn;
 }
 
-void Board_free(Board* board) {
+void Board_visit(Board board, int row, int col) {
+	*(*(board->visited + row) + col) = 1;
+}
+
+void Board_free(Board board) {
 	for (int i = 0; i < board->numRows; ++i) {
 		free(*(board->visited + i));
 	}
@@ -89,7 +96,7 @@ Moves validMoves(int numRows, int numCols, int row, int column) {
 
 
 int actualProgram(int numRows, int numCols, int row, int col) {
-	Board* board = Board_createAndAllocate(numRows, numCols);
+	Board board = Board_createAndAllocate(numRows, numCols);
 	
 	
 	Board_free(board);
