@@ -3,23 +3,16 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <stdbool.h>
-#define arraySet(arr, index, value) *(arr + index) = value
-#define arrayGet(arr, index) *(arr + index)
-
-
-// Taken from https://stackoverflow.com/questions/22705751/cannot-open-include-file-unistd-h-no-such-file-or-directory
-// Replaces the line #include <unistd.h>
-#ifdef _WIN32
-#include <io.h>
-typedef unsigned int pid_t;
-
-#define access _access
-
-#else
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/resource.h>
-#endif
+#include <sys/wait.h>
+
+#define arraySet(arr, index, value) *(arr + index) = value
+#define arrayGet(arr, index) *(arr + index)
+#define matrixSet(mat, row, col, value) *(*(mat + row) + col) = value
+#define matrixGet(mat, row, col) *(*(mat + row) + col)
+
 
 void rlimitSettings() {
 	#ifndef _WIN32
@@ -93,7 +86,7 @@ Board Board_createAndAllocate(const int numRows, const int numCols) {
 }
 
 void Board_visit(Board board, int row, int col) {
-	*(*(board->visited + row) + col) = 1;
+	matrixSet(board->visited, row, col, 1);
 }
 
 bool Board_wasVisitedAt(Board board, int row, int col) {
@@ -101,7 +94,7 @@ bool Board_wasVisitedAt(Board board, int row, int col) {
 		return false;
 	}
 	
-	return *(*(board->visited + row) + col);
+	return matrixGet(board->visited, row, col);
 }
 
 int Board_spacesVisited(Board board) {
@@ -124,7 +117,7 @@ bool Board_allVisited(Board board) {
 
 void Board_free(Board board) {
 	for (int i = 0; i < board->numRows; ++i) {
-		free(*(board->visited + i));
+		free(arrayGet(board->visited, i));
 	}
 	
 	free(board->visited);
@@ -173,7 +166,8 @@ int logBase2(int n) {
 	return toReturn;
 }
 
-int oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, bool isFirstLayer) {
+// readEndOfPipe is -1 if it's closed
+int oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, int readEndOfPipe) {
 	Move validMovesHere = validMoves(board, row, col);
 	int amountValid = numMoves(validMovesHere);
 	int rowModFromMove, colModFromMove;
@@ -185,18 +179,33 @@ int oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, bool is
 			break;
 		case 1:
 			Move_getAdditionsToRowCol(validMovesHere, &rowModFromMove, &colModFromMove);
-			int result = oneRecursiveLayer(board, row + rowModFromMove, col + colModFromMove, writeEndOfPipe, false);
+			int result = oneRecursiveLayer(board, row + rowModFromMove, col + colModFromMove, writeEndOfPipe, -1);
 			exit(result);
 		default:
+			pid_t* pids = calloc(4, sizeof(pid_t));
 			
-			forEachMove(currentMove) {
-				
+			forEachMove(currentMove) {	
 				if (validMovesHere & currentMove) {
 					pid_t p = fork();
+					arraySet(pids, logBase2(currentMove), p);
 					if (p == 0) {
+						if (readEndOfPipe >= 0) {
+							close(readEndOfPipe);
+						}
+						
 						Move_getAdditionsToRowCol(validMovesHere, &rowModFromMove, &colModFromMove);
-						int result = 0;
+						int result = oneRecursiveLayer(board, row + rowModFromMove, col + colModFromMove, writeEndOfPipe, -1);
+						exit(result);
 					}
+				}
+			}
+			forEachMove(currentMove) {
+				if (arrayGet(pids, logBase2(currentMove))) {
+					int status;
+					
+					
+					
+					waitpid(arrayGet(pids, logBase2(currentMove)), &status, WNOHANG);
 				}
 			}
 		
@@ -208,7 +217,7 @@ int oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, bool is
 	
 	
 	
-	int rowMod, colMod;
+	// int rowMod, colMod;
 	
 	
 	// Move_getAdditionsToRowCol()
@@ -223,8 +232,8 @@ int actualProgram(int numRows, int numCols, int row, int col) {
 	Board_visit(board, row, col);
 	
 	pipe(mainPipe);
-	int readEnd = *mainPipe;
-	int writeEnd = *(mainPipe + 1);
+	int readEnd = arrayGet(mainPipe, 0);
+	int writeEnd = arrayGet(mainPipe, 1);
 	
 	Move possibleMovesFromStart = validMoves(board, row, col);
 	
@@ -276,6 +285,7 @@ int main(int argc, const char** argv)
 	printf("%d\n", arrayGet(i, 2));
 	
 	printf("%d %d %d %d\n", logBase2(MOVE_UP), logBase2(MOVE_RIGHT), logBase2(MOVE_DOWN), logBase2(MOVE_LEFT));
+	
 	
 	#endif
 	
