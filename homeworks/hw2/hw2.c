@@ -3,11 +3,16 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <stdbool.h>
+#define arraySet(arr, index, value) *(arr + index) = value
+#define arrayGet(arr, index) *(arr + index)
+
 
 // Taken from https://stackoverflow.com/questions/22705751/cannot-open-include-file-unistd-h-no-such-file-or-directory
 // Replaces the line #include <unistd.h>
 #ifdef _WIN32
 #include <io.h>
+typedef unsigned int pid_t;
+
 #define access _access
 
 #else
@@ -28,12 +33,42 @@ void rlimitSettings() {
 
 typedef enum {
 	MOVE_NONE = 0,
-	MOVE_LEFT = 1,
+	MOVE_UP = 1,
 	MOVE_RIGHT = 2,
-	MOVE_UP = 4,
-	MOVE_DOWN = 8
+	MOVE_DOWN = 4,
+	MOVE_LEFT = 8
+} Move;
+
+#define forEachMove(currentMove) for (Move currentMove = MOVE_UP; currentMove <= MOVE_LEFT; currentMove <<= 1)
+
+
+void Move_getAdditionsToRowCol(const Move move, int* rowModResult, int* colModResult) {
+	switch (move)
+	{
+	case MOVE_LEFT:
+		*rowModResult = 0;
+		*colModResult = -1;
+		break;
+	case MOVE_RIGHT:
+		*rowModResult = 0;
+		*colModResult = 1;
+		break;
+	case MOVE_UP:
+		*rowModResult = -1;
+		*colModResult = 0;
+		break;
+	case MOVE_DOWN:
+		*rowModResult = 1;
+		*colModResult = 0;
+		break;
 	
-} Moves;
+		
+		
+	default:
+		break;
+	}
+}
+
 
 typedef struct {
 	bool** visited;
@@ -44,14 +79,14 @@ typedef struct {
 typedef BoardData* Board;
 
 
-Board Board_createAndAllocate(int numRows, int numCols) {
+Board Board_createAndAllocate(const int numRows, const int numCols) {
 	Board toReturn = calloc(1, sizeof(BoardData));
 	toReturn->numRows = numRows;
 	toReturn->numCols = numCols;
 	
 	toReturn->visited = calloc(toReturn->numRows, sizeof(bool*));
 	for (int i = 0; i < toReturn->numRows; ++i) {
-		*(toReturn->visited + i) = calloc(toReturn->numCols, sizeof(bool));
+		arraySet(toReturn->visited, i, calloc(toReturn->numCols, sizeof(bool)));
 	}
 	
 	return toReturn;
@@ -59,6 +94,32 @@ Board Board_createAndAllocate(int numRows, int numCols) {
 
 void Board_visit(Board board, int row, int col) {
 	*(*(board->visited + row) + col) = 1;
+}
+
+bool Board_wasVisitedAt(Board board, int row, int col) {
+	if (row < 0 || row > (board->numRows - 1) || col < 0 || col > (board->numCols - 1)) {
+		return false;
+	}
+	
+	return *(*(board->visited + row) + col);
+}
+
+int Board_spacesVisited(Board board) {
+	int toReturn = 0;
+	for (int row = 0; row < board->numRows; ++row) {
+		for (int col = 0; col < board->numCols; ++col) {
+			toReturn += Board_wasVisitedAt(board, row, col);
+		}
+	}
+	return toReturn;
+}
+
+int Board_totalSpaces(Board board) {
+	return board->numRows * board->numCols;
+}
+
+bool Board_allVisited(Board board) {
+	return Board_spacesVisited(board) == Board_totalSpaces(board);
 }
 
 void Board_free(Board board) {
@@ -71,7 +132,8 @@ void Board_free(Board board) {
 }
 
 
-int numValidMoves(Moves moves) {
+
+int numMoves(Move moves) {
 	int toReturn = 0;
 	while (moves) {
 		if (moves & 1) {
@@ -82,23 +144,97 @@ int numValidMoves(Moves moves) {
 	return toReturn;
 }
 
-Moves validMoves(int numRows, int numCols, int row, int column) {
-	Moves toReturn = MOVE_NONE;
+Move validMoves(Board board, int row, int column) {
+	Move toReturn = MOVE_NONE;
 	
-	if (row > 0) toReturn &= MOVE_UP;
-	if (column > 0) toReturn &= MOVE_LEFT;
-	if (row < (numRows - 1)) toReturn &= MOVE_DOWN;
-	if (column < (numCols - 1)) toReturn &= MOVE_RIGHT;
+	if (row > 0 && !Board_wasVisitedAt(board, row - 1, column)) {
+		toReturn &= MOVE_UP;
+	}
+	if (column > 0 && !Board_wasVisitedAt(board, row, column - 1)) {
+		toReturn &= MOVE_LEFT;
+	}
+	if (row < (board->numRows - 1) && !Board_wasVisitedAt(board, row + 1, column)) {
+		toReturn &= MOVE_DOWN;
+	}
+	if (column < (board->numCols - 1) && !Board_wasVisitedAt(board, row, column + 1)) {
+		toReturn &= MOVE_RIGHT;
+	}
 	
 	return toReturn;
+	
+}
+
+int logBase2(int n) {
+	int toReturn = -1;
+	while (n) {
+		n >>= 1;
+		++toReturn;
+	}
+	return toReturn;
+}
+
+int oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, bool isFirstLayer) {
+	Move validMovesHere = validMoves(board, row, col);
+	int amountValid = numMoves(validMovesHere);
+	int rowModFromMove, colModFromMove;
+	
+	
+	switch (amountValid) {
+		case 0: 
+			exit(Board_spacesVisited(board));
+			break;
+		case 1:
+			Move_getAdditionsToRowCol(validMovesHere, &rowModFromMove, &colModFromMove);
+			int result = oneRecursiveLayer(board, row + rowModFromMove, col + colModFromMove, writeEndOfPipe, false);
+			exit(result);
+		default:
+			
+			forEachMove(currentMove) {
+				
+				if (validMovesHere & currentMove) {
+					pid_t p = fork();
+					if (p == 0) {
+						Move_getAdditionsToRowCol(validMovesHere, &rowModFromMove, &colModFromMove);
+						int result = 0;
+					}
+				}
+			}
+		
+	}
+	
+	if (!amountValid) {
+		exit(Board_spacesVisited(board));
+	}
+	
+	
+	
+	int rowMod, colMod;
+	
+	
+	// Move_getAdditionsToRowCol()
 	
 }
 
 
 int actualProgram(int numRows, int numCols, int row, int col) {
 	Board board = Board_createAndAllocate(numRows, numCols);
+	int* mainPipe = calloc(2, sizeof(int));
+	
+	Board_visit(board, row, col);
+	
+	pipe(mainPipe);
+	int readEnd = *mainPipe;
+	int writeEnd = *(mainPipe + 1);
+	
+	Move possibleMovesFromStart = validMoves(board, row, col);
+	
+	 {
+		
+	}
 	
 	
+	
+	free(mainPipe);
 	Board_free(board);
 }
 
@@ -114,8 +250,8 @@ int main(int argc, const char** argv)
 	int startingRow = atoi(*(argv + 3));
 	int startingColumn = atoi(*(argv + 4));
 	
-	if (numRows <= 0 || numCols <= 0) {
-		fprintf(stderr, "Error: m or n is <= 0\n");
+	if (numRows <= 1 || numCols <= 1) {
+		fprintf(stderr, "Error: m or n is <= 1\n");
 		return EXIT_FAILURE;
 	}
 	if (numRows * numCols > 255) {
@@ -129,7 +265,18 @@ int main(int argc, const char** argv)
 	}
 	
 	#ifdef DEBUG
-	printf("%d %d %d %d %d\n", m, n, r, c, numValidMoves(10));
+	printf("%d %d %d %d %d\n", numRows, numCols, startingRow, startingColumn, numMoves(10));
+	
+	forEachMove(currentMove) {
+		printf("%d\n", currentMove);
+	}
+	
+	int i[3];
+	arraySet(i, 2, 3);
+	printf("%d\n", arrayGet(i, 2));
+	
+	printf("%d %d %d %d\n", logBase2(MOVE_UP), logBase2(MOVE_RIGHT), logBase2(MOVE_DOWN), logBase2(MOVE_LEFT));
+	
 	#endif
 	
 	actualProgram(numRows, numCols, startingRow, startingColumn);
