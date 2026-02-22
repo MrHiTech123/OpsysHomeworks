@@ -334,7 +334,14 @@ void oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, int re
 					++arrayGet(amountOfToursOfType, typeBuffer);
 				}
 				
-				printf("*** Search complete; found %d open tours and %d closed tours\n", arrayGet(amountOfToursOfType, TOURTYPE_OPEN), arrayGet(amountOfToursOfType, TOURTYPE_CLOSED));
+				
+				if (longestRouteLength == Board_totalSpaces(board)) {
+					printf("*** Search complete; found %d open tours and %d closed tours\n", arrayGet(amountOfToursOfType, TOURTYPE_OPEN), arrayGet(amountOfToursOfType, TOURTYPE_CLOSED));
+				}
+				else {
+					printf("*** Search complete; best solution(s) visited %d squares out of %d\n", longestRouteLength, Board_totalSpaces(board));
+				}
+				
 				free(amountOfToursOfType);
 			}
 			
