@@ -1,4 +1,45 @@
-*** Solving the Wazir tour problem (2x2 board)
+*** Solving the Wazir tour problem (3x3 board)
 *** NO_PARALLEL mode
-*** Start at row 0 and column 0 (move #1)
-*** Detected 2 possible moves after move #1; creating 2 child processes
+*** Start at row 1 and column 0 (move #1)
+*** Detected 3 possible moves after move #1; creating 3 child processes
+*** Detected 2 possible moves after move #3; creating 2 child processes
+*** Detected 2 possible moves after move #3; creating 2 child processes
+*** Detected 3 possible moves after move #2; creating 3 child processes
+*** Detected 2 possible moves after move #5; creating 2 child processes
+*** Detected 2 possible moves after move #3; creating 2 child processes
+*** Detected 2 possible moves after move #4; creating 2 child processes
+*** Detected 2 possible moves after move #4; creating 2 child processes
+*** Detected 2 possible moves after move #5; creating 2 child processes
+*** Detected 2 possible moves after move #3; creating 2 child processes
+*** Detected 2 possible moves after move #3; creating 2 child processes
+*** Dead end at move #4
+*** Detected 2 possible moves after move #7; creating 2 child processes
+*** Detected 2 possible moves after move #7; creating 2 child processes
+*** Dead end at move #8
+*** Dead end at move #4
+*** Detected 2 possible moves after move #5; creating 2 child processes
+*** Detected 2 possible moves after move #5; creating 2 child processes
+*** Detected 2 possible moves after move #5; creating 2 child processes
+*** Dead end at move #6
+*** Detected 2 possible moves after move #5; creating 2 child processes
+*** Detected 2 possible moves after move #7; creating 2 child processes
+*** Detected 2 possible moves after move #7; creating 2 child processes
+*** Dead end at move #8
+*** Dead end at move #6
+*** Dead end at move #8
+*** Dead end at move #8
+*** Dead end at move #8
+*** Dead end at move #6
+*** Dead end at move #8
+*** Dead end at move #8
+*** Dead end at move #6
+*** Dead end at move #8
+*** Dead end at move #6
+*** Dead end at move #8
+*** Dead end at move #8
+*** Dead end at move #6
+*** Dead end at move #8
+*** Dead end at move #8
+*** Dead end at move #8
+*** Dead end at move #8
+*** Search complete; found 6 open tours and 16 closed tours

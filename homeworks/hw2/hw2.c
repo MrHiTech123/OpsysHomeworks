@@ -177,6 +177,11 @@ int numMoves(Move moves) {
 	return toReturn;
 }
 
+int forkAndFlush() {
+	fflush(stdout);
+	return fork();
+}
+
 Move validMoves(Board board, int row, int column) {
 	Move toReturn = 0;
 	
@@ -227,7 +232,7 @@ MAKE_HAS_NON_ZEROES_FUNCTION(hasNonZeroes__pid_t, pid_t);
 
 
 // readEndOfPipe is -1 if it's closed
-int oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, int readEndOfPipe, int startRow, int startCol) {
+void oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, int readEndOfPipe, int startRow, int startCol) {
 	#ifdef DEBUG
 	printf("oneRecuriveLayer(%p %d %d %d %d %d %d)\n", board, row, col, writeEndOfPipe, readEndOfPipe, startRow, startCol);
 	#endif
@@ -246,14 +251,18 @@ int oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, int rea
 		case 0:
 			length = board->numVisited - 1;
 			TourType type = getTypeOfTour(startRow, startCol, row, col);
-			printf("*** Found a %s Wazir tour at move #%d; notifying top-level parent\n", TourType_getName(type), length);
-			write(writeEndOfPipe, &type, sizeof(TourType));
+			if (length == Board_totalSpaces(board)) {
+				printf("*** Found a %s Wazir tour at move #%d; notifying top-level parent\n", TourType_getName(type), length);
+				write(writeEndOfPipe, &type, sizeof(TourType));
+			}
+			else {
+				printf("*** Dead end at move #%d\n", length);
+			}
 			close(writeEndOfPipe);
 			exit(length);
 		case 1:
 			Move_getAdditionsToRowCol(validMovesHere, &rowModFromMove, &colModFromMove);
-			length = oneRecursiveLayer(board, row + rowModFromMove, col + colModFromMove, writeEndOfPipe, -1, startRow, startCol);
-			exit(length);
+			oneRecursiveLayer(board, row + rowModFromMove, col + colModFromMove, writeEndOfPipe, -1, startRow, startCol);
 		default:
 			pid_t* pids = calloc(AMOUNT_DIRECTIONS, sizeof(pid_t));
 			
@@ -261,7 +270,7 @@ int oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, int rea
 			
 			forEachMove(currentMove) {	
 				if (validMovesHere & currentMove) {
-					pid_t p = fork();
+					pid_t p = forkAndFlush();
 					arraySetMove(pids, currentMove, p);
 					if (p == 0) {
 						if (isFirstLayer) {
@@ -270,13 +279,14 @@ int oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, int rea
 						
 						
 						Move_getAdditionsToRowCol(currentMove, &rowModFromMove, &colModFromMove);
-						int result = oneRecursiveLayer(board, row + rowModFromMove, col + colModFromMove, writeEndOfPipe, -1, startRow, startCol);
-						exit(result);
+						oneRecursiveLayer(board, row + rowModFromMove, col + colModFromMove, writeEndOfPipe, -1, startRow, startCol);
 					}
 					else {
 						int nothing;
-						#ifdef PARALLEL
+						#ifndef PARALLEL
+						printf("Start\n");
 						waitpid(p, &nothing, 0);
+						printf("End\n");
 						#endif
 					}
 				}
@@ -288,11 +298,14 @@ int oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, int rea
 			TourType typeBuffer;
 			while (hasNonZeroes__pid_t(pids, AMOUNT_DIRECTIONS)) {
 				forEachMove(currentMove) {
+					printf("Starting move %d", currentMove);
 					pid_t p = arrayGetMove(pids, currentMove);
+					printf(" %d\n", p);
 					if (p) {
 						int status;
 						
 						pid_t childPid = waitpid(p, &status, WNOHANG);
+						printf(" %d\n", status);
 						
 						if (childPid && WIFEXITED(status)) {
 							status = WEXITSTATUS(status);
@@ -322,7 +335,6 @@ int oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, int rea
 			
 			free(pids);
 			exit(longestRouteLength);
-			return longestRouteLength;
 	}
 	
 	if (!amountValid) {
@@ -357,13 +369,13 @@ int actualProgram(int numRows, int numCols, int row, int col) {
 	printf("*** Start at row %d and column %d (move #1)\n", row, col);
 	
 	
-	int toReturn = oneRecursiveLayer(board, row, col, writeEnd, readEnd, row, col);
+	oneRecursiveLayer(board, row, col, writeEnd, readEnd, row, col);
 	
 	
 	
 	free(mainPipe);
 	Board_free(board);
-	return toReturn;
+	return 0;
 }
 
 int main(int argc, const char** argv)
