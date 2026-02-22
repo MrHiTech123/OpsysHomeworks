@@ -290,10 +290,10 @@ void oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, int re
 						Move_getAdditionsToRowCol(currentMove, &rowModFromMove, &colModFromMove);
 						oneRecursiveLayer(board, row + rowModFromMove, col + colModFromMove, writeEndOfPipe, -1, startRow, startCol, depthAllowed - 1);
 					}
-					int nothing;
 					#ifndef PARALLEL
-					waitpid(p, &nothing, 0);
-					arraySetMove(exitStatuses, currentMove, nothing);
+					int status;
+					waitpid(p, &status, 0);
+					arraySetMove(exitStatuses, currentMove, status);
 					#endif
 				
 				}
@@ -302,7 +302,6 @@ void oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, int re
 			close(writeEndOfPipe);
 			
 			int longestRouteLength = 0;
-			TourType typeBuffer;
 			while (hasNonZeroes__pid_t(pids, AMOUNT_DIRECTIONS)) {
 				forEachMove(currentMove) {
 					pid_t p = arrayGetMove(pids, currentMove);
