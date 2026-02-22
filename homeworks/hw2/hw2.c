@@ -267,6 +267,7 @@ void oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, int re
 				#endif
 			}
 			close(writeEndOfPipe);
+			Board_free(board);
 			exit(length);
 		case 1:
 			Move_getAdditionsToRowCol(validMovesHere, &rowModFromMove, &colModFromMove);
@@ -287,6 +288,11 @@ void oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, int re
 					pid_t p = forkAndFlush();
 					arraySetMove(pids, currentMove, p);
 					if (p == 0) {
+						#ifndef PARALLEL
+						free(exitStatuses);
+						#endif
+						free(pids);
+						
 						if (isFirstLayer) {
 							close(readEndOfPipe);
 						}
@@ -334,7 +340,7 @@ void oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, int re
 					
 				}
 			}
-			
+						
 			if (isFirstLayer) {
 				TourType typeBuffer;
 				int* amountOfToursOfType = calloc(2, sizeof(int));
@@ -352,12 +358,13 @@ void oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, int re
 				
 				free(amountOfToursOfType);
 			}
-			
+						
 			#ifndef PARALLEL
 			free(exitStatuses);
 			#endif
 			
 			free(pids);
+			Board_free(board);
 			exit(longestRouteLength);
 	}
 	
@@ -387,6 +394,7 @@ int actualProgram(int numRows, int numCols, int row, int col) {
 	pipe(mainPipe);
 	int readEnd = arrayGet(mainPipe, 0);
 	int writeEnd = arrayGet(mainPipe, 1);
+	free(mainPipe);
 	
 	printf("*** Solving the Wazir tour problem (%dx%d board)\n", numRows, numCols);
 	#ifdef QUIET
@@ -401,16 +409,28 @@ int actualProgram(int numRows, int numCols, int row, int col) {
 	
 	
 	
-	free(mainPipe);
-	Board_free(board);
+	// Board_free(board);
 	return 0;
+}
+
+// bool isAllZeroChars(const char* s) {
+// 	for (const char* c = s; *c; ++c) {
+// 		if (*c != '0') return false;
+// 	}
+// 	return true;
+// }
+
+void printErrors() {
+	
+	fprintf(stderr, "ERROR: Invalid arguments\n");
+	fprintf(stderr, "USAGE: hw2.out <m> <n> <r> <c>\n");
 }
 
 int main(int argc, const char** argv)
 {
 	settings();
 	if (argc != 5) {
-		fprintf(stderr, "Error: usage hw2 m n r c\n");
+		printErrors();
 		return EXIT_FAILURE;
 	}
 	
@@ -420,16 +440,16 @@ int main(int argc, const char** argv)
 	int startingColumn = atoi(*(argv + 4));
 	
 	if (numRows <= 1 || numCols <= 1) {
-		fprintf(stderr, "Error: m or n is <= 1\n");
+		printErrors();
 		return EXIT_FAILURE;
 	}
 	if (numRows * numCols > 255) {
-		fprintf(stderr, "Error, m * n is too big\n");
+		printErrors();
 		return EXIT_FAILURE;
 	}
 	
 	if (startingRow < 0 || startingRow >= numRows || startingColumn < 0 || startingColumn >= numCols) {
-		fprintf(stderr, "Error: starting coords not in bounds\n");
+		printErrors();
 		return EXIT_FAILURE;
 	}
 	
