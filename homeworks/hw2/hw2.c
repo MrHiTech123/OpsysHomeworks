@@ -25,10 +25,10 @@
 
 
 void settings() {
-	struct rlimit rl;
-	getrlimit(RLIMIT_NPROC, &rl);
-	rl.rlim_cur = 32;
-	setrlimit(RLIMIT_NPROC, &rl);
+	// struct rlimit rl;
+	// getrlimit(RLIMIT_NPROC, &rl);
+	// rl.rlim_cur = 32;
+	// setrlimit(RLIMIT_NPROC, &rl);
 	setvbuf(stdout, NULL, _IONBF, 0);
 }
 
@@ -368,7 +368,7 @@ int actualProgram(int numRows, int numCols, int row, int col) {
 
 int main(int argc, const char** argv)
 {
-	// settings();
+	settings();
 	if (argc != 5) {
 		fprintf(stderr, "Error: usage hw2 m n r c\n");
 		return EXIT_FAILURE;
