@@ -17,14 +17,19 @@
 #define AMOUNT_DIRECTIONS 4
 
 
-void rlimitSettings() {
-	#ifndef _WIN32
-		struct rlimit rl;
-		getrlimit(RLIMIT_NPROC, &rl);
-		rl.rlim_cur = 32;
-		setrlimit(RLIMIT_NPROC, &rl);
-	#endif
-	
+#ifdef PARALLEL
+#define PARALLEL_OR_NO_PARALLEL_MODE "PARALLEL"
+#else
+#define PARALLEL_OR_NO_PARALLEL_MODE "NO_PARALLEL"
+#endif
+
+
+void settings() {
+	struct rlimit rl;
+	getrlimit(RLIMIT_NPROC, &rl);
+	rl.rlim_cur = 32;
+	setrlimit(RLIMIT_NPROC, &rl);
+	setvbuf(stdout, NULL, _IONBF, 0);
 }
 
 typedef enum {
@@ -98,6 +103,7 @@ typedef struct {
 	bool** visited;
 	int numRows;
 	int numCols;
+	int numVisited;
 } BoardData;
 
 typedef BoardData* Board;
@@ -107,6 +113,7 @@ Board Board_createAndAllocate(const int numRows, const int numCols) {
 	Board toReturn = calloc(1, sizeof(BoardData));
 	toReturn->numRows = numRows;
 	toReturn->numCols = numCols;
+	toReturn->numVisited = 0;
 	
 	toReturn->visited = calloc(toReturn->numRows, sizeof(bool*));
 	for (int i = 0; i < toReturn->numRows; ++i) {
@@ -118,6 +125,7 @@ Board Board_createAndAllocate(const int numRows, const int numCols) {
 
 void Board_visit(Board board, int row, int col) {
 	matrixSet(board->visited, row, col, 1);
+	++board->numVisited;
 }
 
 bool Board_wasVisitedAt(Board board, int row, int col) {
@@ -128,22 +136,12 @@ bool Board_wasVisitedAt(Board board, int row, int col) {
 	return matrixGet(board->visited, row, col);
 }
 
-int Board_spacesVisited(Board board) {
-	int toReturn = 0;
-	for (int row = 0; row < board->numRows; ++row) {
-		for (int col = 0; col < board->numCols; ++col) {
-			toReturn += Board_wasVisitedAt(board, row, col);
-		}
-	}
-	return toReturn;
-}
-
 int Board_totalSpaces(Board board) {
 	return board->numRows * board->numCols;
 }
 
 bool Board_allVisited(Board board) {
-	return Board_spacesVisited(board) == Board_totalSpaces(board);
+	return board->numVisited == Board_totalSpaces(board);
 }
 
 void Board_print(Board board) {
@@ -246,7 +244,7 @@ int oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, int rea
 	
 	switch (amountValid) {
 		case 0:
-			length = Board_spacesVisited(board);
+			length = board->numVisited - 1;
 			TourType type = getTypeOfTour(startRow, startCol, row, col);
 			printf("*** Found a %s Wazir tour at move #%d; notifying top-level parent\n", TourType_getName(type), length);
 			write(writeEndOfPipe, &type, sizeof(TourType));
@@ -259,7 +257,7 @@ int oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, int rea
 		default:
 			pid_t* pids = calloc(AMOUNT_DIRECTIONS, sizeof(pid_t));
 			
-			printf("*** Detected %d possible moves after move #%d; creating %d child processes\n", amountValid, 0, amountValid);
+			printf("*** Detected %d possible moves after move #%d; creating %d child processes\n", amountValid, board->numVisited - 1, amountValid);
 			
 			forEachMove(currentMove) {	
 				if (validMovesHere & currentMove) {
@@ -328,7 +326,7 @@ int oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, int rea
 	}
 	
 	if (!amountValid) {
-		exit(Board_spacesVisited(board));
+		exit(board->numVisited);
 	}
 	
 	
@@ -342,6 +340,9 @@ int oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, int rea
 
 
 int actualProgram(int numRows, int numCols, int row, int col) {
+	
+	
+	
 	Board board = Board_createAndAllocate(numRows, numCols);
 	int* mainPipe = calloc(2, sizeof(int));
 	
@@ -350,6 +351,11 @@ int actualProgram(int numRows, int numCols, int row, int col) {
 	pipe(mainPipe);
 	int readEnd = arrayGet(mainPipe, 0);
 	int writeEnd = arrayGet(mainPipe, 1);
+	
+	printf("*** Solving the Wazir tour problem (%dx%d board)\n", numRows, numCols);
+	printf("*** %s mode\n", PARALLEL_OR_NO_PARALLEL_MODE);
+	printf("*** Start at row %d and column %d (move #1)\n", row, col);
+	
 	
 	int toReturn = oneRecursiveLayer(board, row, col, writeEnd, readEnd, row, col);
 	
@@ -362,6 +368,7 @@ int actualProgram(int numRows, int numCols, int row, int col) {
 
 int main(int argc, const char** argv)
 {
+	// settings();
 	if (argc != 5) {
 		fprintf(stderr, "Error: usage hw2 m n r c\n");
 		return EXIT_FAILURE;
