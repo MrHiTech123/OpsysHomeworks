@@ -10,8 +10,11 @@
 
 #define arraySet(arr, index, value) *(arr + index) = value
 #define arrayGet(arr, index) *(arr + index)
+#define arraySetMove(arr, move, value) arraySet(arr, logBase2(move), value)
+#define arrayGetMove(arr, move) arrayGet(arr, logBase2(move))
 #define matrixSet(mat, row, col, value) *(*(mat + row) + col) = value
 #define matrixGet(mat, row, col) *(*(mat + row) + col)
+#define AMOUNT_DIRECTIONS 4
 
 
 void rlimitSettings() {
@@ -25,7 +28,6 @@ void rlimitSettings() {
 }
 
 typedef enum {
-	MOVE_NONE = 0,
 	MOVE_UP = 1,
 	MOVE_RIGHT = 2,
 	MOVE_DOWN = 4,
@@ -62,6 +64,19 @@ void Move_getAdditionsToRowCol(const Move move, int* rowModResult, int* colModRe
 	}
 }
 
+typedef struct {
+	int length;
+	int endX;
+	int endY;
+} Tour;
+
+Tour* Tour_createAndAllocate(int length, int endX, int endY) {
+	Tour* toReturn = calloc(1, sizeof(Tour));
+	toReturn->length = length;
+	toReturn->endX = endX;
+	toReturn->endY = endY;
+	return toReturn;
+}
 
 typedef struct {
 	bool** visited;
@@ -115,6 +130,17 @@ bool Board_allVisited(Board board) {
 	return Board_spacesVisited(board) == Board_totalSpaces(board);
 }
 
+void Board_print(Board board) {
+	printf("START BOARD\n");
+	for (int row = 0; row < board->numRows; ++row) {
+		for (int col = 0; col < board->numCols; ++col) {
+			printf("%d ", Board_wasVisitedAt(board, row, col));
+		}
+		printf("\n");
+	}
+	printf("END BOARD\n");
+}
+
 void Board_free(Board board) {
 	for (int i = 0; i < board->numRows; ++i) {
 		free(arrayGet(board->visited, i));
@@ -138,21 +164,21 @@ int numMoves(Move moves) {
 }
 
 Move validMoves(Board board, int row, int column) {
-	Move toReturn = MOVE_NONE;
+	Move toReturn = 0;
 	
 	if (row > 0 && !Board_wasVisitedAt(board, row - 1, column)) {
-		toReturn &= MOVE_UP;
+		toReturn |= MOVE_UP;
 	}
 	if (column > 0 && !Board_wasVisitedAt(board, row, column - 1)) {
-		toReturn &= MOVE_LEFT;
+		toReturn |= MOVE_LEFT;
 	}
 	if (row < (board->numRows - 1) && !Board_wasVisitedAt(board, row + 1, column)) {
-		toReturn &= MOVE_DOWN;
+		toReturn |= MOVE_DOWN;
 	}
 	if (column < (board->numCols - 1) && !Board_wasVisitedAt(board, row, column + 1)) {
-		toReturn &= MOVE_RIGHT;
+		toReturn |= MOVE_RIGHT;
 	}
-	
+			
 	return toReturn;
 	
 }
@@ -166,23 +192,35 @@ int logBase2(int n) {
 	return toReturn;
 }
 
+
+// Define a templated macro here just cuz
+#define MAKE_HAS_NON_ZEROES_FUNCTION(name, class) bool name(class* arr, int length) {for (int i = 0; i < length; ++i) {if (arrayGet(arr, i)) {return true;}} return false;}
+
+MAKE_HAS_NON_ZEROES_FUNCTION(hasNonZeroes__pid_t, pid_t);
+
+
 // readEndOfPipe is -1 if it's closed
-int oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, int readEndOfPipe) {
+int oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, int readEndOfPipe, int startRow, int startCol) {	
 	Move validMovesHere = validMoves(board, row, col);
 	int amountValid = numMoves(validMovesHere);
 	int rowModFromMove, colModFromMove;
 	
-	
+	Board_visit(board, row, col);
+		
 	switch (amountValid) {
-		case 0: 
-			exit(Board_spacesVisited(board));
-			break;
+		case 0:
+			int length = Board_spacesVisited(board);
+			printf("*** Found a %s Wazir tour at move #%d; notifying top-level parent\n", "maybe", length);
+			
+			exit(length);
 		case 1:
 			Move_getAdditionsToRowCol(validMovesHere, &rowModFromMove, &colModFromMove);
-			int result = oneRecursiveLayer(board, row + rowModFromMove, col + colModFromMove, writeEndOfPipe, -1);
+			int result = oneRecursiveLayer(board, row + rowModFromMove, col + colModFromMove, writeEndOfPipe, -1, startRow, startCol);
 			exit(result);
 		default:
-			pid_t* pids = calloc(4, sizeof(pid_t));
+			pid_t* pids = calloc(AMOUNT_DIRECTIONS, sizeof(pid_t));
+			
+			printf("*** Detected %d possible moves after move #%d; creating %d child processes\n", amountValid, 0, amountValid);
 			
 			forEachMove(currentMove) {	
 				if (validMovesHere & currentMove) {
@@ -193,22 +231,43 @@ int oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, int rea
 							close(readEndOfPipe);
 						}
 						
-						Move_getAdditionsToRowCol(validMovesHere, &rowModFromMove, &colModFromMove);
-						int result = oneRecursiveLayer(board, row + rowModFromMove, col + colModFromMove, writeEndOfPipe, -1);
+						
+						Move_getAdditionsToRowCol(currentMove, &rowModFromMove, &colModFromMove);
+						int result = oneRecursiveLayer(board, row + rowModFromMove, col + colModFromMove, writeEndOfPipe, -1, startRow, startCol);
 						exit(result);
+					}
+					else {
+						waitpid(p, NULL, 0);
 					}
 				}
 			}
-			forEachMove(currentMove) {
-				if (arrayGet(pids, logBase2(currentMove))) {
-					int status;
-					
-					
-					
-					waitpid(arrayGet(pids, logBase2(currentMove)), &status, WNOHANG);
+			
+			int longestRouteLength = 0;			
+			while (hasNonZeroes__pid_t(pids, AMOUNT_DIRECTIONS)) {
+				forEachMove(currentMove) {
+					pid_t p = arrayGetMove(pids, currentMove);
+					if (p) {
+						int status;
+						
+						pid_t childPid = waitpid(p, &status, 0);
+						
+						if (childPid && WIFEXITED(status)) {
+							status = WEXITSTATUS(status);
+							if (status > longestRouteLength) {
+								longestRouteLength = status;
+							}
+							arraySetMove(pids, currentMove, 0);
+						}
+						
+					}
 				}
+				
+				
 			}
-		
+			
+			
+			free(pids);
+			return longestRouteLength;
 	}
 	
 	if (!amountValid) {
@@ -235,16 +294,13 @@ int actualProgram(int numRows, int numCols, int row, int col) {
 	int readEnd = arrayGet(mainPipe, 0);
 	int writeEnd = arrayGet(mainPipe, 1);
 	
-	Move possibleMovesFromStart = validMoves(board, row, col);
-	
-	 {
-		
-	}
+	int toReturn = oneRecursiveLayer(board, row, col, writeEnd, readEnd, row, col);
 	
 	
 	
 	free(mainPipe);
 	Board_free(board);
+	return toReturn;
 }
 
 int main(int argc, const char** argv)
@@ -286,6 +342,9 @@ int main(int argc, const char** argv)
 	
 	printf("%d %d %d %d\n", logBase2(MOVE_UP), logBase2(MOVE_RIGHT), logBase2(MOVE_DOWN), logBase2(MOVE_LEFT));
 	
+	int a,b;
+	Move_getAdditionsToRowCol(MOVE_UP, &a, &b);
+	printf("%d %d\n", a, b);
 	
 	#endif
 	
