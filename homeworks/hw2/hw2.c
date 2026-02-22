@@ -232,10 +232,14 @@ MAKE_HAS_NON_ZEROES_FUNCTION(hasNonZeroes__pid_t, pid_t);
 
 
 // readEndOfPipe is -1 if it's closed
-void oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, int readEndOfPipe, int startRow, int startCol) {
+void oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, int readEndOfPipe, int startRow, int startCol, int depthAllowed) {
 	#ifdef DEBUG
 	printf("oneRecuriveLayer(%p %d %d %d %d %d %d)\n", board, row, col, writeEndOfPipe, readEndOfPipe, startRow, startCol);
 	#endif
+	
+	if (!depthAllowed) {
+		return;
+	}
 	
 	Move validMovesHere = validMoves(board, row, col);
 	int amountValid = numMoves(validMovesHere);
@@ -262,7 +266,7 @@ void oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, int re
 			exit(length);
 		case 1:
 			Move_getAdditionsToRowCol(validMovesHere, &rowModFromMove, &colModFromMove);
-			oneRecursiveLayer(board, row + rowModFromMove, col + colModFromMove, writeEndOfPipe, -1, startRow, startCol);
+			oneRecursiveLayer(board, row + rowModFromMove, col + colModFromMove, writeEndOfPipe, -1, startRow, startCol, depthAllowed - 1);
 		default:
 			pid_t* pids = calloc(AMOUNT_DIRECTIONS, sizeof(pid_t));
 			
@@ -284,7 +288,7 @@ void oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, int re
 						
 						
 						Move_getAdditionsToRowCol(currentMove, &rowModFromMove, &colModFromMove);
-						oneRecursiveLayer(board, row + rowModFromMove, col + colModFromMove, writeEndOfPipe, -1, startRow, startCol);
+						oneRecursiveLayer(board, row + rowModFromMove, col + colModFromMove, writeEndOfPipe, -1, startRow, startCol, depthAllowed - 1);
 					}
 					int nothing;
 					#ifndef PARALLEL
@@ -385,7 +389,7 @@ int actualProgram(int numRows, int numCols, int row, int col) {
 	printf("*** Start at row %d and column %d (move #1)\n", row, col);
 	
 	
-	oneRecursiveLayer(board, row, col, writeEnd, readEnd, row, col);
+	oneRecursiveLayer(board, row, col, writeEnd, readEnd, row, col, Board_totalSpaces(board));
 	
 	
 	

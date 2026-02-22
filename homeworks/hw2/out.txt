@@ -1,45 +1,17 @@
 *** Solving the Wazir tour problem (3x3 board)
 *** NO_PARALLEL mode
-*** Start at row 0 and column 1 (move #1)
-*** Detected 3 possible moves after move #1; creating 3 child processes
-*** Detected 2 possible moves after move #3; creating 2 child processes
-*** Detected 2 possible moves after move #5; creating 2 child processes
-*** Detected 2 possible moves after move #7; creating 2 child processes
-*** Dead end at move #8
-*** Dead end at move #8
-*** Detected 2 possible moves after move #7; creating 2 child processes
-*** Dead end at move #8
-*** Dead end at move #8
-*** Detected 2 possible moves after move #4; creating 2 child processes
-*** Detected 2 possible moves after move #5; creating 2 child processes
-*** Dead end at move #6
-*** Dead end at move #8
-*** Detected 2 possible moves after move #5; creating 2 child processes
-*** Dead end at move #6
-*** Dead end at move #8
-*** Detected 3 possible moves after move #2; creating 3 child processes
-*** Detected 2 possible moves after move #3; creating 2 child processes
-*** Dead end at move #4
-*** Dead end at move #8
-*** Detected 2 possible moves after move #3; creating 2 child processes
-*** Dead end at move #6
-*** Dead end at move #6
-*** Detected 2 possible moves after move #3; creating 2 child processes
-*** Dead end at move #4
-*** Dead end at move #8
-*** Detected 2 possible moves after move #3; creating 2 child processes
-*** Detected 2 possible moves after move #4; creating 2 child processes
-*** Detected 2 possible moves after move #5; creating 2 child processes
-*** Dead end at move #6
-*** Dead end at move #8
-*** Detected 2 possible moves after move #5; creating 2 child processes
-*** Dead end at move #8
-*** Dead end at move #6
-*** Detected 2 possible moves after move #5; creating 2 child processes
-*** Detected 2 possible moves after move #7; creating 2 child processes
-*** Dead end at move #8
-*** Dead end at move #8
-*** Detected 2 possible moves after move #7; creating 2 child processes
-*** Dead end at move #8
-*** Dead end at move #8
-*** Search complete; best solution(s) visited 8 squares out of 9
+*** Start at row 1 and column 1 (move #1)
+*** Detected 4 possible moves after move #1; creating 4 child processes
+*** Detected 2 possible moves after move #2; creating 2 child processes
+*** Found an open Wazir tour at move #9; notifying top-level parent
+*** Found an open Wazir tour at move #9; notifying top-level parent
+*** Detected 2 possible moves after move #2; creating 2 child processes
+*** Found an open Wazir tour at move #9; notifying top-level parent
+*** Found an open Wazir tour at move #9; notifying top-level parent
+*** Detected 2 possible moves after move #2; creating 2 child processes
+*** Found an open Wazir tour at move #9; notifying top-level parent
+*** Found an open Wazir tour at move #9; notifying top-level parent
+*** Detected 2 possible moves after move #2; creating 2 child processes
+*** Found an open Wazir tour at move #9; notifying top-level parent
+*** Found an open Wazir tour at move #9; notifying top-level parent
+*** Search complete; found 8 open tours and 0 closed tours
