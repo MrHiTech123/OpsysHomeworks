@@ -47,9 +47,9 @@ typedef enum {
 const char* TourType_getName(TourType tourType) {
 	switch (tourType) {
 		case TOURTYPE_OPEN:
-			return "open";
+			return "n open";
 		case TOURTYPE_CLOSED:
-			return "closed";
+			return " closed";
 	}
 	return NULL;
 }
@@ -252,7 +252,7 @@ void oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, int re
 			length = board->numVisited - 1;
 			TourType type = getTypeOfTour(startRow, startCol, row, col);
 			if (length == Board_totalSpaces(board)) {
-				printf("*** Found a %s Wazir tour at move #%d; notifying top-level parent\n", TourType_getName(type), length);
+				printf("*** Found a%s Wazir tour at move #%d; notifying top-level parent\n", TourType_getName(type), length);
 				write(writeEndOfPipe, &type, sizeof(TourType));
 			}
 			else {
@@ -306,7 +306,7 @@ void oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, int re
 						int status;
 						
 						pid_t childPid = waitpid(p, &status, WNOHANG);
-												
+						
 						#ifndef PARALLEL
 						status = arrayGetMove(exitStatuses, currentMove);
 						#endif
