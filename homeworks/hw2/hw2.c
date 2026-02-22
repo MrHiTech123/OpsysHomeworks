@@ -338,7 +338,9 @@ void oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, int re
 				free(amountOfToursOfType);
 			}
 			
-			
+			#ifndef PARALLEL
+			free(exitStatuses);
+			#endif
 			
 			free(pids);
 			exit(longestRouteLength);
