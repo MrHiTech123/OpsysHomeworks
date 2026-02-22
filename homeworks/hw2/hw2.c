@@ -256,11 +256,15 @@ void oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, int re
 			length = board->numVisited - 1;
 			TourType type = getTypeOfTour(startRow, startCol, row, col);
 			if (length == Board_totalSpaces(board)) {
+				#ifndef QUIET
 				printf("*** Found a%s Wazir tour at move #%d; notifying top-level parent\n", TourType_getName(type), length);
+				#endif
 				write(writeEndOfPipe, &type, sizeof(TourType));
 			}
 			else {
+				#ifndef QUIET
 				printf("*** Dead end at move #%d\n", length);
+				#endif
 			}
 			close(writeEndOfPipe);
 			exit(length);
@@ -270,8 +274,9 @@ void oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, int re
 		default:
 			pid_t* pids = calloc(AMOUNT_DIRECTIONS, sizeof(pid_t));
 			
-			
+			#ifndef QUIET
 			printf("*** Detected %d possible moves after move #%d; creating %d child processes\n", amountValid, board->numVisited - 1, amountValid);
+			#endif
 			
 			#ifndef PARALLEL
 			int* exitStatuses = calloc(AMOUNT_DIRECTIONS, sizeof(int));
@@ -384,7 +389,11 @@ int actualProgram(int numRows, int numCols, int row, int col) {
 	int writeEnd = arrayGet(mainPipe, 1);
 	
 	printf("*** Solving the Wazir tour problem (%dx%d board)\n", numRows, numCols);
+	#ifdef QUIET
+	printf("*** %s and QUIET mode\n", PARALLEL_OR_NO_PARALLEL_MODE);
+	#else
 	printf("*** %s mode\n", PARALLEL_OR_NO_PARALLEL_MODE);
+	#endif
 	printf("*** Start at row %d and column %d (move #1)\n", row, col);
 	
 	
