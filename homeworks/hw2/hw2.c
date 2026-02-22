@@ -288,14 +288,14 @@ void oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, int re
 						Move_getAdditionsToRowCol(currentMove, &rowModFromMove, &colModFromMove);
 						oneRecursiveLayer(board, row + rowModFromMove, col + colModFromMove, writeEndOfPipe, -1, startRow, startCol);
 					}
-					else {
-						int nothing;
-						#ifndef PARALLEL
-						printf("Start\n");
-						waitpid(p, &nothing, 0);
-						printf("End\n");
-						#endif
-					}
+					int nothing;
+					#ifndef PARALLEL
+					printf("Start\n");
+					waitpid(p, &nothing, 0);
+					printf("Process for %d exited with status %d\n", currentMove, nothing);
+					printf("End\n");
+					#endif
+				
 				}
 			}
 			
@@ -320,6 +320,9 @@ void oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, int re
 								longestRouteLength = status;
 							}
 							arraySetMove(pids, currentMove, 0);
+						}
+						else if (childPid && WIFSIGNALED(status)) {
+							printf("SIGNALED: %d\n", status);
 						}
 						
 					}
