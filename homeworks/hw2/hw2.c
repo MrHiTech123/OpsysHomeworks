@@ -274,6 +274,10 @@ void oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, int re
 			
 			printf("*** Detected %d possible moves after move #%d; creating %d child processes\n", amountValid, board->numVisited - 1, amountValid);
 			
+			#ifndef PARALLEL
+			int* exitStatuses = calloc(AMOUNT_DIRECTIONS, sizeof(int));
+			#endif
+			
 			forEachMove(currentMove) {	
 				if (validMovesHere & currentMove) {
 					printf("Current move: %d\n", currentMove);
@@ -292,6 +296,7 @@ void oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, int re
 					#ifndef PARALLEL
 					printf("Start\n");
 					waitpid(p, &nothing, 0);
+					arraySetMove(exitStatuses, currentMove, nothing);
 					printf("Process for %d exited with status %d\n", currentMove, nothing);
 					printf("End\n");
 					#endif
@@ -313,6 +318,10 @@ void oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, int re
 						
 						pid_t childPid = waitpid(p, &status, WNOHANG);
 						printf("Current status %d exited: %d\n", status, WIFEXITED(status));
+						
+						#ifndef PARALLEL
+						status = arrayGetMove(exitStatuses, currentMove);
+						#endif
 						
 						if (childPid && WIFEXITED(status)) {
 							status = WEXITSTATUS(status);
