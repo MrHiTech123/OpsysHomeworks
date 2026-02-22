@@ -264,13 +264,8 @@ void oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, int re
 			Move_getAdditionsToRowCol(validMovesHere, &rowModFromMove, &colModFromMove);
 			oneRecursiveLayer(board, row + rowModFromMove, col + colModFromMove, writeEndOfPipe, -1, startRow, startCol);
 		default:
-			printf("-----------------------------------------------\n");
 			pid_t* pids = calloc(AMOUNT_DIRECTIONS, sizeof(pid_t));
-			for (int i = 0; i < AMOUNT_DIRECTIONS; ++i) {
-				printf("PID INIT: %d\n", pids[i]);
-			}
 			
-			printf("Valid: %d\n", validMovesHere);
 			
 			printf("*** Detected %d possible moves after move #%d; creating %d child processes\n", amountValid, board->numVisited - 1, amountValid);
 			
@@ -280,7 +275,6 @@ void oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, int re
 			
 			forEachMove(currentMove) {	
 				if (validMovesHere & currentMove) {
-					printf("Current move: %d\n", currentMove);
 					pid_t p = forkAndFlush();
 					arraySetMove(pids, currentMove, p);
 					if (p == 0) {
@@ -294,11 +288,8 @@ void oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, int re
 					}
 					int nothing;
 					#ifndef PARALLEL
-					printf("Start\n");
 					waitpid(p, &nothing, 0);
 					arraySetMove(exitStatuses, currentMove, nothing);
-					printf("Process for %d exited with status %d\n", currentMove, nothing);
-					printf("End\n");
 					#endif
 				
 				}
@@ -310,15 +301,12 @@ void oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, int re
 			TourType typeBuffer;
 			while (hasNonZeroes__pid_t(pids, AMOUNT_DIRECTIONS)) {
 				forEachMove(currentMove) {
-					printf("Starting move %d", currentMove);
 					pid_t p = arrayGetMove(pids, currentMove);
-					printf(", pid %d\n", p);
 					if (p) {
 						int status;
 						
 						pid_t childPid = waitpid(p, &status, WNOHANG);
-						printf("Current status %d exited: %d\n", status, WIFEXITED(status));
-						
+												
 						#ifndef PARALLEL
 						status = arrayGetMove(exitStatuses, currentMove);
 						#endif
@@ -337,7 +325,6 @@ void oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, int re
 					}
 					
 				}
-				sleep(1);
 			}
 			
 			if (isFirstLayer) {
