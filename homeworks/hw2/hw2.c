@@ -200,7 +200,11 @@ MAKE_HAS_NON_ZEROES_FUNCTION(hasNonZeroes__pid_t, pid_t);
 
 
 // readEndOfPipe is -1 if it's closed
-int oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, int readEndOfPipe, int startRow, int startCol) {	
+int oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, int readEndOfPipe, int startRow, int startCol) {
+	#ifdef DEBUG
+	printf("oneRecuriveLayer(%p %d %d %d %d %d %d)\n", board, row, col, writeEndOfPipe, readEndOfPipe, startRow, startCol);
+	#endif
+	
 	Move validMovesHere = validMoves(board, row, col);
 	int amountValid = numMoves(validMovesHere);
 	int rowModFromMove, colModFromMove;
@@ -211,12 +215,11 @@ int oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, int rea
 		case 0:
 			int length = Board_spacesVisited(board);
 			printf("*** Found a %s Wazir tour at move #%d; notifying top-level parent\n", "maybe", length);
-			
+			printf("Exiting with status %d\n", length);
 			exit(length);
 		case 1:
 			Move_getAdditionsToRowCol(validMovesHere, &rowModFromMove, &colModFromMove);
-			int result = oneRecursiveLayer(board, row + rowModFromMove, col + colModFromMove, writeEndOfPipe, -1, startRow, startCol);
-			exit(result);
+			oneRecursiveLayer(board, row + rowModFromMove, col + colModFromMove, writeEndOfPipe, -1, startRow, startCol);
 		default:
 			pid_t* pids = calloc(AMOUNT_DIRECTIONS, sizeof(pid_t));
 			
@@ -225,7 +228,7 @@ int oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, int rea
 			forEachMove(currentMove) {	
 				if (validMovesHere & currentMove) {
 					pid_t p = fork();
-					arraySet(pids, logBase2(currentMove), p);
+					arraySetMove(pids, currentMove, p);
 					if (p == 0) {
 						if (readEndOfPipe >= 0) {
 							close(readEndOfPipe);
@@ -237,36 +240,55 @@ int oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, int rea
 						exit(result);
 					}
 					else {
-						waitpid(p, NULL, 0);
+						int nothing;
+						#ifdef PARALLEL
+						printf("Start NP waitpid\n");
+						waitpid(p, &nothing, 0);
+						printf("End NP waitpid\n");
+						#endif
 					}
 				}
 			}
 			
 			int longestRouteLength = 0;			
 			while (hasNonZeroes__pid_t(pids, AMOUNT_DIRECTIONS)) {
+				printf("Loop\n");
 				forEachMove(currentMove) {
+					printf("Move: %d\n", currentMove);
 					pid_t p = arrayGetMove(pids, currentMove);
 					if (p) {
 						int status;
 						
-						pid_t childPid = waitpid(p, &status, 0);
+						pid_t childPid = waitpid(p, &status, WNOHANG);
+						printf("Status: %d Exited: %d\n", status, WIFEXITED(status));
 						
 						if (childPid && WIFEXITED(status)) {
+							printf("Found thingy\n");
 							status = WEXITSTATUS(status);
 							if (status > longestRouteLength) {
 								longestRouteLength = status;
 							}
+							printf("Setting pids[%d] to 0\n", currentMove);
 							arraySetMove(pids, currentMove, 0);
 						}
 						
 					}
+					
 				}
+				
+				printf("%d\n", hasNonZeroes__pid_t(pids, AMOUNT_DIRECTIONS));
+				for (int i = 0; i < AMOUNT_DIRECTIONS; ++i) {
+					printf("\t%d\n", pids[i]);
+				}
+				
+				sleep(1);
 				
 				
 			}
 			
 			
 			free(pids);
+			exit(longestRouteLength);
 			return longestRouteLength;
 	}
 	
