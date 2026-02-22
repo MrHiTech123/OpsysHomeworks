@@ -34,6 +34,22 @@ typedef enum {
 	MOVE_LEFT = 8
 } Move;
 
+typedef enum {
+	TOURTYPE_OPEN,
+	TOURTYPE_CLOSED
+} TourType;
+
+const char* TourType_getName(TourType tourType) {
+	switch (tourType) {
+		case TOURTYPE_OPEN:
+			return "open";
+		case TOURTYPE_CLOSED:
+			return "closed";
+	}
+	return NULL;
+}
+
+
 #define forEachMove(currentMove) for (Move currentMove = MOVE_UP; currentMove <= MOVE_LEFT; currentMove <<= 1)
 
 
@@ -192,6 +208,19 @@ int logBase2(int n) {
 	return toReturn;
 }
 
+int manhattanDistance(int x1, int y1, int x2, int y2) {
+	return abs(x2 - x1) + abs(y2 - y1);
+}
+
+TourType getTypeOfTour(int startX, int startY, int endX, int endY) {
+	if (manhattanDistance(startX, startY, endX, endY) <= 1) {
+		return TOURTYPE_CLOSED;
+	}
+	else {
+		return TOURTYPE_OPEN;
+	}
+}
+
 
 // Define a templated macro here just cuz
 #define MAKE_HAS_NON_ZEROES_FUNCTION(name, class) bool name(class* arr, int length) {for (int i = 0; i < length; ++i) {if (arrayGet(arr, i)) {return true;}} return false;}
@@ -208,18 +237,25 @@ int oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, int rea
 	Move validMovesHere = validMoves(board, row, col);
 	int amountValid = numMoves(validMovesHere);
 	int rowModFromMove, colModFromMove;
+	bool isFirstLayer = readEndOfPipe >= 0;
+	
+	
 	
 	Board_visit(board, row, col);
-		
+	int length;
+	
 	switch (amountValid) {
 		case 0:
-			int length = Board_spacesVisited(board);
-			printf("*** Found a %s Wazir tour at move #%d; notifying top-level parent\n", "maybe", length);
-			printf("Exiting with status %d\n", length);
+			length = Board_spacesVisited(board);
+			TourType type = getTypeOfTour(startRow, startCol, row, col);
+			printf("*** Found a %s Wazir tour at move #%d; notifying top-level parent\n", TourType_getName(type), length);
+			write(writeEndOfPipe, &type, sizeof(TourType));
+			close(writeEndOfPipe);
 			exit(length);
 		case 1:
 			Move_getAdditionsToRowCol(validMovesHere, &rowModFromMove, &colModFromMove);
-			oneRecursiveLayer(board, row + rowModFromMove, col + colModFromMove, writeEndOfPipe, -1, startRow, startCol);
+			length = oneRecursiveLayer(board, row + rowModFromMove, col + colModFromMove, writeEndOfPipe, -1, startRow, startCol);
+			exit(length);
 		default:
 			pid_t* pids = calloc(AMOUNT_DIRECTIONS, sizeof(pid_t));
 			
@@ -230,7 +266,7 @@ int oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, int rea
 					pid_t p = fork();
 					arraySetMove(pids, currentMove, p);
 					if (p == 0) {
-						if (readEndOfPipe >= 0) {
+						if (isFirstLayer) {
 							close(readEndOfPipe);
 						}
 						
@@ -242,49 +278,48 @@ int oneRecursiveLayer(Board board, int row, int col, int writeEndOfPipe, int rea
 					else {
 						int nothing;
 						#ifdef PARALLEL
-						printf("Start NP waitpid\n");
 						waitpid(p, &nothing, 0);
-						printf("End NP waitpid\n");
 						#endif
 					}
 				}
 			}
 			
-			int longestRouteLength = 0;			
+			close(writeEndOfPipe);
+			
+			int longestRouteLength = 0;
+			TourType typeBuffer;
 			while (hasNonZeroes__pid_t(pids, AMOUNT_DIRECTIONS)) {
-				printf("Loop\n");
 				forEachMove(currentMove) {
-					printf("Move: %d\n", currentMove);
 					pid_t p = arrayGetMove(pids, currentMove);
 					if (p) {
 						int status;
 						
 						pid_t childPid = waitpid(p, &status, WNOHANG);
-						printf("Status: %d Exited: %d\n", status, WIFEXITED(status));
 						
 						if (childPid && WIFEXITED(status)) {
-							printf("Found thingy\n");
 							status = WEXITSTATUS(status);
 							if (status > longestRouteLength) {
 								longestRouteLength = status;
 							}
-							printf("Setting pids[%d] to 0\n", currentMove);
 							arraySetMove(pids, currentMove, 0);
 						}
 						
 					}
 					
 				}
-				
-				printf("%d\n", hasNonZeroes__pid_t(pids, AMOUNT_DIRECTIONS));
-				for (int i = 0; i < AMOUNT_DIRECTIONS; ++i) {
-					printf("\t%d\n", pids[i]);
+			}
+			
+			if (isFirstLayer) {
+				TourType typeBuffer;
+				int* amountOfToursOfType = calloc(2, sizeof(int));
+				while (read(readEndOfPipe, &typeBuffer, sizeof(TourType))) {
+					++arrayGet(amountOfToursOfType, typeBuffer);
 				}
 				
-				sleep(1);
-				
-				
+				printf("*** Search complete; found %d open tours and %d closed tours\n", arrayGet(amountOfToursOfType, TOURTYPE_OPEN), arrayGet(amountOfToursOfType, TOURTYPE_CLOSED));
+				free(amountOfToursOfType);
 			}
+			
 			
 			
 			free(pids);
