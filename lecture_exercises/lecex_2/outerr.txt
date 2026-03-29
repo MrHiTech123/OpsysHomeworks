@@ -1,0 +1,2 @@
+ERROR: No uppercase letters found
+PARENT: child process terminated abnormally
