@@ -4,46 +4,51 @@
 
 
 #define at(arr, i) (*(arr.values + i))
-#define createArray(type, len) {.values = calloc((len), sizeof(type)), .length = (len)}
+#define nameOfArrayType(typeName) Array_##typeName
+
+#define createArray(type, len) (nameOfArrayType(type)){.values = calloc((len), sizeof(type)), .length = (len)}
 #define freeArray(array) free(array.values);
 // #define copyArrayStart(dest, src, start) memcpy(dest.values, src.values + start, dest.length)
-#define copyArray(dest, src) copyArrayStart(dest, src, 0)
-#define copyArray(type, src, start, end) ({int len = (end - start); voidArray toReturn = createArray(type, len); memcpy(toReturn.values, src.values + start, len); return toReturn})
+// #define copyArray(dest, src) copyArrayStart(dest, src, 0)
+#define copyArray(type, src, start, end) ({int len = (end - start); nameOfArrayType(type) toReturn = createArray(type, len); memcpy(toReturn.values, src.values + start, len); toReturn;})
 #define copyArrayStart(type, src, start) copyArray(type, src, start, src.length)
-#define copyArrayEnd(type, src, end) copyArray(type, src, start, 0)
-#define defineArrayType(arrayTypeName, typeName) typedef struct {typeName* values; int length;} arrayTypeName
-defineArrayType(voidArray, void);
-defineArrayType(IntArray, int);
-defineArrayType(IntArrayArray, IntArray);
+#define copyArrayEnd(type, src, end) copyArray(type, src, 0, end)
+#define defineArrayType(typeName) typedef struct {typeName* values; int length;} nameOfArrayType(typeName)
+
+defineArrayType(int);
+defineArrayType(Array_int);
 
 extern int* numbers;
 extern int n;
 extern int numthreads;
 extern int comparisons;
 
-void printIntArray(IntArray array) {
+void printIntArray(Array_int array) {
 	for (int i = 0; i < array.length; ++i) {
 		printf("%d, ", at(array, i));
 	}
 	printf("\n");
 }
 
-void freeIntArrayArray(IntArrayArray toFree) {
+void freeNestedIntArray(Array_Array_int toFree) {
 	for (int i = 0; i < toFree.length; ++i) {
 		freeArray(at(toFree, i));
 	}
 	freeArray(toFree);
 }
 
-IntArrayArray divide_createArray(IntArray arr) {
-	IntArrayArray toReturn = createArray(IntArray, 2);
+Array_Array_int divide_createArray(Array_int arr) {
+	Array_Array_int toReturn = createArray(Array_int, 2);
+	
+	at(toReturn, 0);
+	at(toReturn, 0) = createArray(int, 0);
 	
 	int arrLen = 0;
-	at(toReturn, 0) = (IntArray)createArray(int, arr.length / 2 + arr.length % 2); //{.values = calloc((arr.length / 2 + arr.length % 2), sizeof(int)), .length = (arr.length / 2 + arr.length % 2)}
-	at(toReturn, 1) = (IntArray)createArray(int, arr.length / 2);
+	at(toReturn, 0) = copyArrayEnd(int, arr, arr.length / 2 + arr.length % 2); //{.values = calloc((arr.length / 2 + arr.length % 2), sizeof(int)), .length = (arr.length / 2 + arr.length % 2)}
+	at(toReturn, 1) = (Array_int)createArray(int, arr.length / 2);
 	
-	copyArrayStart(at(toReturn, 0), arr, 0);
-	copyArrayStart(at(toReturn, 1), arr, at(toReturn, 0).length);
+	// copyArrayStart(at(toReturn, 0), arr, 0);
+	// copyArrayStart(at(toReturn, 1), arr, at(toReturn, 0).length);
 	
 	
 	// createArray(int, arr.length / 2 + arr.length % 2);
@@ -52,8 +57,8 @@ IntArrayArray divide_createArray(IntArray arr) {
 	
 }
 
-IntArray merge_createArray(const IntArray first, const IntArray second) {
-	IntArray toReturn = createArray(int, first.length + second.length);
+Array_int merge_createArray(const Array_int first, const Array_int second) {
+	Array_int toReturn = createArray(int, first.length + second.length);
 	int firstIndex = 0;
 	int secondIndex = 0;
 	int toReturnIndex = 0;
@@ -87,13 +92,13 @@ IntArray merge_createArray(const IntArray first, const IntArray second) {
 }
 
 void* mergeSort(void* arrayVoid) {
-	IntArray array = *(IntArray*)arrayVoid;
+	Array_int array = *(Array_int*)arrayVoid;
 	
 	if (array.length <= 1) {
 		return arrayVoid;
 	}
 	
-	IntArrayArray halves = divide_createArray();
+	// Array_Array_int halves = divide_createArray();
 	
 	
 	
@@ -102,7 +107,7 @@ void* mergeSort(void* arrayVoid) {
 }
 
 int hw3() {
-	IntArray array = {.values = numbers, .length = n};
+	Array_int array = {.values = numbers, .length = n};
 	
 	#ifdef DEBUG
 		printIntArray(array);
