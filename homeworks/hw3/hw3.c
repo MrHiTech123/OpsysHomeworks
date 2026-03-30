@@ -3,8 +3,10 @@
 #include <string.h>
 #include <pthread.h>
 
+typedef void* voidPointer;
 
-#define at(arr, i) (*(arr.values + i))
+#define addr(arr, i) (arr.values + i)
+#define at(arr, i) (*addr(arr, i))
 #define nameOfArrayType(typeName) Array_##typeName
 
 #define createArray(type, len) (nameOfArrayType(type)){.values = calloc((len), sizeof(type)), .length = (len)}
@@ -17,6 +19,8 @@
 
 defineArrayType(int);
 defineArrayType(Array_int);
+defineArrayType(pthread_t);
+defineArrayType(voidPointer);
 
 extern int* numbers;
 extern int n;
@@ -98,7 +102,6 @@ Array_int merge_createArray(const Array_int first, const Array_int second) {
 #define arrayFromVoidVoidMergeSort(ogPtr) ({void* ptr = ogPtr; Array_int toReturn = *(Array_int*)ptr; free(ptr); toReturn;})
 #define mergeSort(arr) arrayFromVoidVoidMergeSort(voidVoidMergeSort(&(arr)))
 
-
 void* voidVoidMergeSort(void* arrayVoid) {
 	Array_int array = *(Array_int*)arrayVoid;
 	Array_int* toReturn = calloc(1, sizeof(Array_int));
@@ -113,11 +116,24 @@ void* voidVoidMergeSort(void* arrayVoid) {
 	Array_Array_int sortedHalves = createArray(Array_int, 2);
 	
 	
-	at(sortedHalves, 0) = mergeSort(at(halves, 0));
-	at(sortedHalves, 1) = mergeSort(at(halves, 1));
+	
+	Array_pthread_t threads = createArray(pthread_t, 2);
+	
+	pthread_create(&at(threads, 0), NULL, &voidVoidMergeSort, &at(halves, 0));
+	pthread_create(&at(threads, 1), NULL, &voidVoidMergeSort, &at(halves, 1));
+	
+	Array_voidPointer pointersToMergedArrays = createArray(voidPointer, 2);
+	pthread_join(at(threads, 0), addr(pointersToMergedArrays, 0));
+	pthread_join(at(threads, 1), addr(pointersToMergedArrays, 1));
+	
+	at(sortedHalves, 0) = arrayFromVoidVoidMergeSort(at(pointersToMergedArrays, 0));
+	at(sortedHalves, 1) = arrayFromVoidVoidMergeSort(at(pointersToMergedArrays, 1));
+	
 	
 	Array_int sorted = merge_createArray(at(sortedHalves, 0), at(sortedHalves, 1));
 	
+	freeArray(threads);
+	freeArray(pointersToMergedArrays);
 	freeNestedIntArray(halves);
 	freeNestedIntArray(sortedHalves);
 	
