@@ -8,11 +8,10 @@
 
 #define createArray(type, len) (nameOfArrayType(type)){.values = calloc((len), sizeof(type)), .length = (len)}
 #define freeArray(array) free(array.values);
-// #define copyArrayStart(dest, src, start) memcpy(dest.values, src.values + start, dest.length)
-// #define copyArray(dest, src) copyArrayStart(dest, src, 0)
 #define copyArray(type, src, start, end) ({int len = ((end) - (start)); nameOfArrayType(type) toReturn = createArray(type, len); memcpy(toReturn.values, src.values + start, len * sizeof(type)); toReturn;})
 #define copyArrayStart(type, src, start) copyArray(type, src, start, src.length)
 #define copyArrayEnd(type, src, end) copyArray(type, src, 0, end)
+#define copyArrayFull(type, src) copyArray(type, src, 0, src.length)
 #define defineArrayType(typeName) typedef struct {typeName* values; int length;} nameOfArrayType(typeName)
 
 defineArrayType(int);
@@ -40,22 +39,10 @@ void freeNestedIntArray(Array_Array_int toFree) {
 Array_Array_int divide_createArray(Array_int arr) {
 	Array_Array_int toReturn = createArray(Array_int, 2);
 	
-	at(toReturn, 0);
-	at(toReturn, 0) = createArray(int, 0);
-	
-	int arrLen = 0;
-	at(toReturn, 0) = copyArrayEnd(int, arr, arr.length / 2 + arr.length % 2); //{.values = calloc((arr.length / 2 + arr.length % 2), sizeof(int)), .length = (arr.length / 2 + arr.length % 2)}
+	at(toReturn, 0) = copyArrayEnd(int, arr, arr.length / 2 + arr.length % 2);
 	at(toReturn, 1) = copyArrayStart(int, arr, arr.length / 2);
 	
-	// copyArrayStart(at(toReturn, 0), arr, 0);
-	// copyArrayStart(at(toReturn, 1), arr, at(toReturn, 0).length);
-	
-	
-	// createArray(int, arr.length / 2 + arr.length % 2);
-	// at(toReturn, 1) = createArray
-	
 	return toReturn;
-	
 }
 
 Array_int merge_createArray(const Array_int first, const Array_int second) {
@@ -75,6 +62,7 @@ Array_int merge_createArray(const Array_int first, const Array_int second) {
 			at(toReturn, toReturnIndex) = at(second, secondIndex);
 			++secondIndex;
 		}
+		++toReturnIndex;
 	}
 	
 	for (; firstIndex < first.length; ++firstIndex) {
@@ -92,41 +80,45 @@ Array_int merge_createArray(const Array_int first, const Array_int second) {
 	
 }
 
+
+
 void* mergeSort(void* arrayVoid) {
 	Array_int array = *(Array_int*)arrayVoid;
+	Array_int* toReturn = calloc(1, sizeof(Array_int));
+	
 	
 	if (array.length <= 1) {
-		return arrayVoid;
+		*toReturn = copyArrayFull(int, array);
+		return toReturn;
 	}
 	
-	// Array_Array_int halves = divide_createArray();
+	Array_Array_int halves = divide_createArray(array);
 	
+	Array_Array_int sortedHalves = createArray(Array_int, 2);
+	at(sortedHalves, 0) = *(Array_int*)mergeSort(&at(halves, 0));
+	at(sortedHalves, 1) = *(Array_int*)mergeSort(&at(halves, 1));
 	
+	Array_int sorted = merge_createArray(at(sortedHalves, 0), at(sortedHalves, 1));
 	
+	freeNestedIntArray(halves);
+	freeNestedIntArray(sortedHalves);
 	
-	
+	*toReturn = sorted;
+	return toReturn;
 }
 
 int hw3() {
-	Array_int array = {.values = numbers, .length = n};
-	
+	Array_int originalRealArray = {.values = numbers, .length = n};
+	Array_int arrayToSort = copyArrayFull(int, originalRealArray);
 	
 	#ifdef DEBUG
-		printIntArray(array);
+		printIntArray(arrayToSort);
 	#endif
 	
-	mergeSort(&array);
+	Array_int sorted = *(Array_int*)mergeSort(&arrayToSort);
 	
 	#ifdef DEBUG
-		
-		Array_Array_int halves = divide_createArray(array);
-		
-		printIntArray(at(halves, 0));
-		printIntArray(at(halves, 1));
-		
-		printf("Done\n");
-		
-		// printIntArray(array);
+		printIntArray(sorted);
 	#endif
 	
 	
