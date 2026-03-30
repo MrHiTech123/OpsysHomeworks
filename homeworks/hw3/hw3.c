@@ -10,7 +10,7 @@
 #define freeArray(array) free(array.values);
 // #define copyArrayStart(dest, src, start) memcpy(dest.values, src.values + start, dest.length)
 // #define copyArray(dest, src) copyArrayStart(dest, src, 0)
-#define copyArray(type, src, start, end) ({int len = (end - start); nameOfArrayType(type) toReturn = createArray(type, len); memcpy(toReturn.values, src.values + start, len); toReturn;})
+#define copyArray(type, src, start, end) ({int len = ((end) - (start)); nameOfArrayType(type) toReturn = createArray(type, len); memcpy(toReturn.values, src.values + start, len * sizeof(type)); toReturn;})
 #define copyArrayStart(type, src, start) copyArray(type, src, start, src.length)
 #define copyArrayEnd(type, src, end) copyArray(type, src, 0, end)
 #define defineArrayType(typeName) typedef struct {typeName* values; int length;} nameOfArrayType(typeName)
@@ -45,7 +45,7 @@ Array_Array_int divide_createArray(Array_int arr) {
 	
 	int arrLen = 0;
 	at(toReturn, 0) = copyArrayEnd(int, arr, arr.length / 2 + arr.length % 2); //{.values = calloc((arr.length / 2 + arr.length % 2), sizeof(int)), .length = (arr.length / 2 + arr.length % 2)}
-	at(toReturn, 1) = (Array_int)createArray(int, arr.length / 2);
+	at(toReturn, 1) = copyArrayStart(int, arr, arr.length / 2);
 	
 	// copyArrayStart(at(toReturn, 0), arr, 0);
 	// copyArrayStart(at(toReturn, 1), arr, at(toReturn, 0).length);
@@ -54,6 +54,7 @@ Array_Array_int divide_createArray(Array_int arr) {
 	// createArray(int, arr.length / 2 + arr.length % 2);
 	// at(toReturn, 1) = createArray
 	
+	return toReturn;
 	
 }
 
@@ -109,19 +110,23 @@ void* mergeSort(void* arrayVoid) {
 int hw3() {
 	Array_int array = {.values = numbers, .length = n};
 	
+	
 	#ifdef DEBUG
 		printIntArray(array);
 	#endif
 	
 	mergeSort(&array);
 	
-	#ifndef DEBUG
+	#ifdef DEBUG
 		
-		divide_createArray(array);
+		Array_Array_int halves = divide_createArray(array);
 		
+		printIntArray(at(halves, 0));
+		printIntArray(at(halves, 1));
 		
+		printf("Done\n");
 		
-		printIntArray(array);
+		// printIntArray(array);
 	#endif
 	
 	
