@@ -23,6 +23,9 @@ extern int n;
 extern int numthreads;
 extern int numcomparisons;
 
+pthread_mutex_t mutex_numthreads = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t mutex_numcomparisons = PTHREAD_MUTEX_INITIALIZER;
+
 void printIntArray(Array_int array) {
 	for (int i = 0; i < array.length; ++i) {
 		printf("%d, ", at(array, i));
@@ -53,7 +56,7 @@ Array_Array_int divide_createArray(Array_int arr) {
 // 	return a < b;
 // }
 
-#define lessThanAndLogComparison(a, b) ({++numcomparisons; (a) < (b);})
+#define lessThanAndLogComparison(a, b) ({pthread_mutex_lock(&mutex_numcomparisons); ++numcomparisons; pthread_mutex_unlock(&mutex_numcomparisons); (a) < (b);})
 
 Array_int merge_createArray(const Array_int first, const Array_int second) {
 	Array_int toReturn = createArray(int, first.length + second.length);
