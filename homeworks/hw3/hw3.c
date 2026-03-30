@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <pthread.h>
 
 
 #define at(arr, i) (*(arr.values + i))
@@ -20,7 +21,7 @@ defineArrayType(Array_int);
 extern int* numbers;
 extern int n;
 extern int numthreads;
-extern int comparisons;
+extern int numcomparisons;
 
 void printIntArray(Array_int array) {
 	for (int i = 0; i < array.length; ++i) {
@@ -47,6 +48,13 @@ Array_Array_int divide_createArray(Array_int arr) {
 	return toReturn;
 }
 
+// int lessThanAndLogComparison(int a, int b) {
+// 	++comparisons;
+// 	return a < b;
+// }
+
+#define lessThanAndLogComparison(a, b) ({++numcomparisons; (a) < (b);})
+
 Array_int merge_createArray(const Array_int first, const Array_int second) {
 	Array_int toReturn = createArray(int, first.length + second.length);
 	int firstIndex = 0;
@@ -56,7 +64,7 @@ Array_int merge_createArray(const Array_int first, const Array_int second) {
 	
 	
 	while (firstIndex < first.length && secondIndex < second.length) {
-		if (at(first, firstIndex) < at(second, secondIndex)) {
+		if (lessThanAndLogComparison(at(first, firstIndex), at(second, secondIndex))) {
 			at(toReturn, toReturnIndex) = at(first, firstIndex);
 			++firstIndex;
 		}
@@ -88,7 +96,6 @@ Array_int merge_createArray(const Array_int first, const Array_int second) {
 void* voidVoidMergeSort(void* arrayVoid) {
 	Array_int array = *(Array_int*)arrayVoid;
 	Array_int* toReturn = calloc(1, sizeof(Array_int));
-	
 	
 	if (array.length <= 1) {
 		*toReturn = copyArrayFull(int, array);
