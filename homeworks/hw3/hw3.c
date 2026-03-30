@@ -102,6 +102,8 @@ Array_int merge_createArray(const Array_int first, const Array_int second) {
 #define arrayFromVoidVoidMergeSort(ogPtr) ({void* ptr = ogPtr; Array_int toReturn = *(Array_int*)ptr; free(ptr); toReturn;})
 #define mergeSort(arr) arrayFromVoidVoidMergeSort(voidVoidMergeSort(&(arr)))
 
+#define createThread(functionName, arg) ({pthread_t __to_return__; pthread_create(&__to_return__, NULL, &functionName, &arg); __to_return__;})
+
 void* voidVoidMergeSort(void* arrayVoid) {
 	Array_int array = *(Array_int*)arrayVoid;
 	Array_int* toReturn = calloc(1, sizeof(Array_int));
@@ -119,8 +121,8 @@ void* voidVoidMergeSort(void* arrayVoid) {
 	
 	Array_pthread_t threads = createArray(pthread_t, 2);
 	
-	pthread_create(&at(threads, 0), NULL, &voidVoidMergeSort, &at(halves, 0));
-	pthread_create(&at(threads, 1), NULL, &voidVoidMergeSort, &at(halves, 1));
+	at(threads, 0) = createThread(voidVoidMergeSort, at(halves, 0));
+	at(threads, 1) = createThread(voidVoidMergeSort, at(halves, 1));
 	
 	Array_voidPointer pointersToMergedArrays = createArray(voidPointer, 2);
 	pthread_join(at(threads, 0), addr(pointersToMergedArrays, 0));
