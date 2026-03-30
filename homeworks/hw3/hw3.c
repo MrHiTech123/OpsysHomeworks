@@ -26,6 +26,7 @@ extern int numcomparisons;
 pthread_mutex_t mutex_numthreads = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutex_numcomparisons = PTHREAD_MUTEX_INITIALIZER;
 
+
 void printIntArray(Array_int array) {
 	for (int i = 0; i < array.length; ++i) {
 		printf("%d, ", at(array, i));
@@ -93,7 +94,9 @@ Array_int merge_createArray(const Array_int first, const Array_int second) {
 	
 }
 
-#define mergeSort(arr) ({void* ptr = voidVoidMergeSort(&(arr)); Array_int toReturn = *(Array_int*)ptr; free(ptr); toReturn;})
+
+#define arrayFromVoidVoidMergeSort(ogPtr) ({void* ptr = ogPtr; Array_int toReturn = *(Array_int*)ptr; free(ptr); toReturn;})
+#define mergeSort(arr) arrayFromVoidVoidMergeSort(voidVoidMergeSort(&(arr)))
 
 
 void* voidVoidMergeSort(void* arrayVoid) {
