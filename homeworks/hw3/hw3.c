@@ -53,7 +53,7 @@ void freeNestedIntArray(Array_Array_int toFree) {
 Array_Array_int divide_createArray(Array_int arr) {
 	Array_Array_int toReturn = createArray(Array_int, 2);
 	
-	int divisionPoint = arr.length / 2 + arr.length % 2;
+	int divisionPoint = arr.length / 2;
 	
 	at(toReturn, 0) = copyArrayEnd(int, arr, divisionPoint);
 	at(toReturn, 1) = copyArrayStart(int, arr, divisionPoint);
