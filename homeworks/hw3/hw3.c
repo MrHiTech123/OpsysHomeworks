@@ -3,7 +3,7 @@
 #include <string.h>
 #include <pthread.h>
 
-typedef void* voidPointer;
+typedef void* VoidPointer;
 
 #define addr(arr, i) (arr.values + i)
 #define at(arr, i) (*addr(arr, i))
@@ -20,7 +20,7 @@ typedef void* voidPointer;
 defineArrayType(int);
 defineArrayType(Array_int);
 defineArrayType(pthread_t);
-defineArrayType(voidPointer);
+defineArrayType(VoidPointer);
 
 extern int* numbers;
 extern int n;
@@ -29,6 +29,7 @@ extern int numcomparisons;
 
 pthread_mutex_t mutex_numthreads = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutex_numcomparisons = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t mutex_exiting = PTHREAD_MUTEX_INITIALIZER;
 
 
 void printIntArray(Array_int array) {
@@ -98,11 +99,18 @@ Array_int merge_createArray(const Array_int first, const Array_int second) {
 	
 }
 
+void error() {
+	pthread_mutex_lock(&mutex_exiting);
+	fprintf(stderr, "ERROR: Failed to do something\n");
+	exit(EXIT_FAILURE);
+	pthread_mutex_unlock(&mutex_exiting);
+}
 
 #define arrayFromVoidVoidMergeSort(ogPtr) ({void* ptr = ogPtr; Array_int toReturn = *(Array_int*)ptr; free(ptr); toReturn;})
 #define mergeSort(arr) arrayFromVoidVoidMergeSort(voidVoidMergeSort(&(arr)))
 
-#define createThread(functionName, arg) ({pthread_t __to_return__; pthread_create(&__to_return__, NULL, &functionName, &arg); __to_return__;})
+#define handleThreadTracking ({pthread_mutex_lock(&mutex_numthreads); ++numthreads; pthread_mutex_unlock(&mutex_numthreads);})
+#define createThread(functionName, arg) ({handleThreadTracking; pthread_t __to_return__; int __worked__ = pthread_create(&__to_return__, NULL, &functionName, &(arg)); if (__worked__ != 0) error(); __to_return__;})
 
 void* voidVoidMergeSort(void* arrayVoid) {
 	Array_int array = *(Array_int*)arrayVoid;
@@ -124,7 +132,7 @@ void* voidVoidMergeSort(void* arrayVoid) {
 	at(threads, 0) = createThread(voidVoidMergeSort, at(halves, 0));
 	at(threads, 1) = createThread(voidVoidMergeSort, at(halves, 1));
 	
-	Array_voidPointer pointersToMergedArrays = createArray(voidPointer, 2);
+	Array_VoidPointer pointersToMergedArrays = createArray(VoidPointer, 2);
 	pthread_join(at(threads, 0), addr(pointersToMergedArrays, 0));
 	pthread_join(at(threads, 1), addr(pointersToMergedArrays, 1));
 	
