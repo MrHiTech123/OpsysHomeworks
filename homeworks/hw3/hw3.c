@@ -163,15 +163,16 @@ int hw3() {
 	Array_int sorted = mergeSort(arrayToSort);
 	
 	freeArray(arrayToSort);
-	freeArray(originalRealArray);
 	
 	
 	#ifdef DEBUG
 		printIntArray(sorted);
 	#endif
 	
-	numbers = sorted.values;
-	n = sorted.length;
+	memcpy(originalRealArray.values, sorted.values, originalRealArray.length * sizeof(int));
+	
+	freeArray(sorted);
+	
 	
 	return EXIT_SUCCESS;
 }
