@@ -27,9 +27,13 @@ extern int n;
 extern int numthreads;
 extern int numcomparisons;
 
+void assign_thread_label(char* label);
+
 pthread_mutex_t mutex_numthreads = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutex_numcomparisons = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutex_exiting = PTHREAD_MUTEX_INITIALIZER;
+
+
 
 
 void printIntArray(Array_int array) {
@@ -109,8 +113,22 @@ void error() {
 #define arrayFromVoidVoidMergeSort(ogPtr) ({void* ptr = ogPtr; Array_int toReturn = *(Array_int*)ptr; free(ptr); toReturn;})
 #define mergeSort(arr) arrayFromVoidVoidMergeSort(voidVoidMergeSort(&(arr)))
 
-#define handleThreadTracking ({pthread_mutex_lock(&mutex_numthreads); ++numthreads; pthread_mutex_unlock(&mutex_numthreads);})
-#define createThread(functionName, arg) ({handleThreadTracking; pthread_t __to_return__; int __worked__ = pthread_create(&__to_return__, NULL, &functionName, &(arg)); if (__worked__ != 0) error(); __to_return__;})
+
+void noteOneThread() {
+	pthread_mutex_lock(&mutex_numthreads);
+		char* label = calloc(5, sizeof(char));
+		assign_thread_label(label);
+		#ifdef DEBUG
+			printf("New thread %s\n", label);
+		#endif
+		free(label);
+		
+		++numthreads;
+	pthread_mutex_unlock(&mutex_numthreads);
+}
+
+
+#define createThread(functionName, arg) ({noteOneThread(); pthread_t __to_return__; int __worked__ = pthread_create(&__to_return__, NULL, &functionName, &(arg)); if (__worked__ != 0) error(); __to_return__;})
 
 void* voidVoidMergeSort(void* arrayVoid) {
 	Array_int array = *(Array_int*)arrayVoid;
@@ -162,6 +180,7 @@ int hw3() {
 	
 	Array_int sorted = mergeSort(arrayToSort);
 	
+	noteOneThread();
 	freeArray(arrayToSort);
 	
 	

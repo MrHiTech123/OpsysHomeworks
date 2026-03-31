@@ -21,6 +21,7 @@ int hw3();  /* write the hw3() function and place your code in hw3.c */
  */
 void assign_thread_label( char * label )
 {
+	sprintf(label, "%04d", numthreads);
   /* varies from test case to test case */
 }
 
