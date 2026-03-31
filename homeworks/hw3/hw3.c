@@ -61,12 +61,7 @@ Array_Array_int divide_createArray(Array_int arr) {
 	return toReturn;
 }
 
-// int lessThanAndLogComparison(int a, int b) {
-// 	++comparisons;
-// 	return a < b;
-// }
-
-#define lessThanAndLogComparison(a, b) ({pthread_mutex_lock(&mutex_numcomparisons); ++numcomparisons; pthread_mutex_unlock(&mutex_numcomparisons); (a) < (b);})
+#define lessThanOrEqualAndLogComparison(a, b) ({pthread_mutex_lock(&mutex_numcomparisons); ++numcomparisons; pthread_mutex_unlock(&mutex_numcomparisons); (a) <= (b);})
 
 Array_int merge_createArray(const Array_int first, const Array_int second) {
 	Array_int toReturn = createArray(int, first.length + second.length);
@@ -77,7 +72,7 @@ Array_int merge_createArray(const Array_int first, const Array_int second) {
 	
 	
 	while (firstIndex < first.length && secondIndex < second.length) {
-		if (lessThanAndLogComparison(at(first, firstIndex), at(second, secondIndex))) {
+		if (lessThanOrEqualAndLogComparison(at(first, firstIndex), at(second, secondIndex))) {
 			at(toReturn, toReturnIndex) = at(first, firstIndex);
 			++firstIndex;
 		}
