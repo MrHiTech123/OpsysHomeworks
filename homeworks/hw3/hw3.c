@@ -181,6 +181,10 @@ int hw3() {
 	
 	#ifdef DEBUG
 		printIntArray(sorted);
+		char* nextThreadLabel = calloc(5, sizeof(char));
+		assign_thread_label(nextThreadLabel);
+		printf("%s\n", nextThreadLabel);
+		free(nextThreadLabel);
 	#endif
 	
 	memcpy(originalRealArray.values, sorted.values, originalRealArray.length * sizeof(int));
