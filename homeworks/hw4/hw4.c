@@ -7,7 +7,7 @@
 
 int main(int argc, char const *argv[])
 {
-	LinkedList_int myList = LinkedList_create(int);
+	LinkedList_int myList = LinkedList_create;
 	
 	LinkedList_append(int, myList, 1);
 	LinkedList_append(int, myList, 3);
@@ -20,17 +20,17 @@ int main(int argc, char const *argv[])
 	
 	LinkedList_free(int, myList);
 	
-	// LinkedList_str strings = LinkedList_create(str);
+	LinkedList_str strings = LinkedList_create;
 	
-	// LinkedList_append(str, strings, "Abcd");
-	// LinkedList_append(str, strings, "Hello");
-	// LinkedList_append(str, strings, "Jason");
+	LinkedList_append(str, strings, "Abcd");
+	LinkedList_append(str, strings, "Hello");
+	LinkedList_append(str, strings, "Jason");
 	
-	// LinkedList__foreach(str, currentWord, strings) {
-	// 	printf("%s\n", currentWord);
-	// }
+	LinkedList__foreach(str, currentWord, strings) {
+		printf("%s\n", currentWord);
+	}
 	
-	// LinkedList_free(str, strings);
+	LinkedList_free(str, strings);
 	
 	
 	return 0;
