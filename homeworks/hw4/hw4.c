@@ -7,32 +7,32 @@
 
 int main(int argc, char const *argv[])
 {
-	LinkedList_int myList = LinkedList_create;
+	LinkedList_int myList = LinkedList__create;
 	
-	LinkedList_append(int, myList, 1);
-	LinkedList_append(int, myList, 3);
-	LinkedList_append(int, myList, 5);
+	LinkedList__append(int, myList, 1);
+	LinkedList__append(int, myList, 3);
+	LinkedList__append(int, myList, 5);
 	
 	// printf("%d\n", __LINE__);
 	LinkedList__foreach(int, i, myList) {
 		printf("%d\n", i);
 	}
 	
-	LinkedList_free(int, myList);
+	LinkedList__free(int, myList);
 	
-	LinkedList_str strings = LinkedList_create;
+	LinkedList_str strings = LinkedList__create;
 	
-	LinkedList_append(str, strings, "Abcd");
-	LinkedList_append(str, strings, "Hello");
-	LinkedList_append(str, strings, "Jason");
+	LinkedList__append(str, strings, "Abcd");
+	LinkedList__append(str, strings, "Hello");
+	LinkedList__append(str, strings, "Jason");
 	
 	LinkedList__foreach(str, currentWord, strings) {
 		printf("%s\n", currentWord);
 	}
 	
-	LinkedList_free(str, strings);
+	LinkedList__free(str, strings);
 	
-	LinkedList_str strings2 = LinkedList_create;
+	LinkedList_str strings2 = LinkedList__create;
 	
 	// LinkedList_append(str, strings2, "I LIED");
 	
@@ -40,7 +40,7 @@ int main(int argc, char const *argv[])
 		printf("SHOULD NOT PRINT %s\n", thing);
 	}
 	
-	LinkedList_free(str, strings2);
+	LinkedList__free(str, strings2);
 	
 	return 0;
 }
