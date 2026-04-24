@@ -32,6 +32,15 @@ int main(int argc, char const *argv[])
 	
 	LinkedList_free(str, strings);
 	
+	LinkedList_str strings2 = LinkedList_create;
+	
+	LinkedList_append(str, strings2, "I LIED");
+	
+	LinkedList__foreach(str, thing, strings2) {
+		printf("SHOULD NOT PRINT %s\n", thing);
+	}
+	
+	LinkedList_free(str, strings2);
 	
 	return 0;
 }
