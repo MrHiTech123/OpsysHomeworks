@@ -7,7 +7,7 @@ typedef char* str;
 #define linkedlistTypeName(type) LinkedList_##type
 
 #define UNIQUE(name) name ## __LINE__
-#define LinkedList__foreach(type, varname, list) type varname = list->value; for (linkedlistTypeName(type) UNIQUE(currentList) = list; UNIQUE(currentList); ({UNIQUE(currentList) = UNIQUE(currentList)->next; varname = (UNIQUE(currentList))? UNIQUE(currentList)->value : varname;}))
+#define LinkedList__foreach(type, varname, list) type varname; if (list) {varname = list->value;}; for (linkedlistTypeName(type) UNIQUE(currentList) = list; UNIQUE(currentList); ({UNIQUE(currentList) = UNIQUE(currentList)->next; varname = (UNIQUE(currentList))? UNIQUE(currentList)->value : varname;}))
 #define LinkedList_create NULL
 #define LinkedList_createNodePtr(type) calloc(1, sizeof(linkedlistNodeTypeName(type)))
 #define LinkedList_append(type, list, v) if (list) {linkedlistTypeName(type) UNIQUE(current) = list; while (UNIQUE(current)->next) {UNIQUE(current) = UNIQUE(current)->next;}; linkedlistTypeName(type) next = LinkedList_createNodePtr(type); next->value = v; UNIQUE(current)->next = next;} else {list = LinkedList_createNodePtr(type); list->value = v;}
