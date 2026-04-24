@@ -9,6 +9,7 @@ int main(int argc, char const *argv[])
 {
 	LinkedList_int myList = LinkedList__create;
 	
+	
 	LinkedList__append(int, myList, 1);
 	LinkedList__append(int, myList, 3);
 	LinkedList__append(int, myList, 5);
