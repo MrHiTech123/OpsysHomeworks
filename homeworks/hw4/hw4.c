@@ -13,7 +13,7 @@ int main(int argc, char const *argv[])
 	LinkedList_append(int, myList, 3);
 	LinkedList_append(int, myList, 5);
 	
-	printf("%d\n", __LINE__);
+	// printf("%d\n", __LINE__);
 	LinkedList__foreach(int, i, myList) {
 		printf("%d\n", i);
 	}
@@ -34,7 +34,7 @@ int main(int argc, char const *argv[])
 	
 	LinkedList_str strings2 = LinkedList_create;
 	
-	LinkedList_append(str, strings2, "I LIED");
+	// LinkedList_append(str, strings2, "I LIED");
 	
 	LinkedList__foreach(str, thing, strings2) {
 		printf("SHOULD NOT PRINT %s\n", thing);
