@@ -35,7 +35,7 @@ int main(int argc, char const *argv[])
 		printf("%s\n", currentWord);
 	}
 	
-	LinkedList__free(str, strings);
+	LinkedList__freeFree(str, strings);
 	
 	LinkedList_str strings2 = LinkedList__create;
 	

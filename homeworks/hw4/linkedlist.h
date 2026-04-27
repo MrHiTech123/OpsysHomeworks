@@ -12,13 +12,13 @@ typedef char* str;
 #define LinkedList__createNodePtr(type, v) ({LINKEDLIST_NODETYPE_NAME(type)* MACRO_VAR(toReturn) = calloc(1, sizeof(LINKEDLIST_NODETYPE_NAME(type))); MACRO_VAR(toReturn)->value = v; MACRO_VAR(toReturn);})
 #define LinkedList__append(type, list, v) {++list.length; LINKEDLIST_NODETYPE_NAME(type)* MACRO_VAR(current) = list.first; while (MACRO_VAR(current) && MACRO_VAR(current)->next) {MACRO_VAR(current) = MACRO_VAR(current)->next;}; LINKEDLIST_NODETYPE_NAME(type)* MACRO_VAR(next) = LinkedList__createNodePtr(type, v); if (list.first) {MACRO_VAR(current)->next = MACRO_VAR(next);} else {list.first = MACRO_VAR(next);};}
 #define __LINKED_LIST_FREE(type, list, freeFunction) {LINKEDLIST_NODETYPE_NAME(type)* MACRO_VAR(current) = list.first; while (MACRO_VAR(current)) {LINKEDLIST_NODETYPE_NAME(type)* MACRO_VAR(next) = MACRO_VAR(current)->next; freeFunction(MACRO_VAR(current)); MACRO_VAR(current) = MACRO_VAR(next);}}
-#define LinkedList__free(type, list) __LINKED_LIST_FREE , free
-#define LinkedList__free(type, list)
+#define LinkedList__free(type, list) __LINKED_LIST_FREE(type, list, free)
+#define LinkedList__freeFree(type, list) __LINKED_LIST_FREE(type, list, LinkedList__free)
+#define LinkedList__freeFreeFree(type, list) __LINKED_LIST_FREE(type, list LinkedList__freeFre ## e)
 
 #define DECLARE_LINKEDLIST_TYPE(type) typedef struct LINKEDLIST_NODETYPE_NAME(type) {struct LINKEDLIST_NODETYPE_NAME(type)* next; type value;} LINKEDLIST_NODETYPE_NAME(type); typedef struct {LINKEDLIST_NODETYPE_NAME(type)* first; int length;} LINKEDLIST_TYPE_NAME(type)
 
 
 DECLARE_LINKEDLIST_TYPE(int);
 DECLARE_LINKEDLIST_TYPE(str);
-
 
