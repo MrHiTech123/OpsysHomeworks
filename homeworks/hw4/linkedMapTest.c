@@ -16,7 +16,8 @@ int main(int argc, char const *argv[])
 	printf("%s\n", LinkedMap__find(int, str, map, 2, equals));
 	
 	// ({str toReturn; LinkedMapDataStruct_int_str macroVar_current__LINE__; if (map.first) {macroVar_current__LINE__ = map.first->value;}; for (LinkedListNode_LinkedMapDataStruct_int_str* macroVar_currentList__LINE__ = map.first; macroVar_currentList__LINE__; ({macroVar_currentList__LINE__ = macroVar_currentList__LINE__->next; macroVar_current__LINE__ = (macroVar_currentList__LINE__)? macroVar_currentList__LINE__->value : macroVar_current__LINE__;})) {if (macroVar_current__LINE__.key == 2) {toReturn = macroVar_current__LINE__.value;}}; toReturn});
-
+	
+	LinkedMap__free(int, str, map);
 	
 	
 	

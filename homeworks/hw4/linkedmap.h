@@ -21,6 +21,7 @@ DECLARE_LINKEDMAP_TYPE(str, LinkedList_str);
 #define equals(x, y) x == y
 
 #define LinkedMap__insert(keyType, valueType, map, k, v) {LINKEDMAP_DATA_STRUCT_NAME(keyType, valueType) MACRO_VAR(toAppend) = {.key = k, .value = v}; LinkedList__append(LINKEDMAP_DATA_STRUCT_NAME(keyType, valueType), map, MACRO_VAR(toAppend))}
+#define LinkedMap__free(keyType, valueType, map) LinkedList__free(LINKEDMAP_DATA_STRUCT_NAME(keyType, valueType), map)
 #define LinkedMap__find(keyType, valueType, map, k, equalityFunction) ({valueType toReturn; LinkedList__foreach(LINKEDMAP_DATA_STRUCT_NAME(keyType, valueType), MACRO_VAR(current), map) {if (equalityFunction(MACRO_VAR(current).key, k)) {toReturn = MACRO_VAR(current).value; break;}}; toReturn;})
 
 

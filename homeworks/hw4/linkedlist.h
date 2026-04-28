@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
-
-typedef char* str;
+#include "mystring.h"
 
 #define LINKEDLIST_NODETYPE_NAME(type) LinkedListNode_##type
 #define LINKEDLIST_TYPE_NAME(type) LinkedList_##type
