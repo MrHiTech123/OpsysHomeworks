@@ -110,6 +110,8 @@ void freeAllStrings() {
 }
 
 
+
+
 int main(int argc, char** argv)
 {
 	settings();
