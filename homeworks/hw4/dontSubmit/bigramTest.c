@@ -49,7 +49,9 @@ int main(int argc, char const *argv[])
 	printf("%d\n", LinkedList__length(LinkedList_str, sentences));
 	
 	LinkedList__foreach(LinkedList_str, currentList, sentences) {
-		printf("%s\n", joinAll(currentList));
+		str sent = joinAll(currentList);
+		printf("%s\n", sent);
+		free(sent);
 	}
 	
 	LinkedList__foreach(LinkedList_str, subList, sentences) {

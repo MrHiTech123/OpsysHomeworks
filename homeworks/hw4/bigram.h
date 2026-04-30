@@ -142,6 +142,8 @@ LinkedList_LinkedList_str BiGramHolder__generateSentences(BiGramHolder holder, s
 			
 			LinkedList__append(str, subList, LinkedList__getLast(str, possibleNextWords));
 			LinkedList__append(LinkedList_str, toReplaceToReturn, subList);
+			
+			LinkedList__free(str, possibleNextWords);
 		}
 		
 		LinkedList__free(LinkedList_str, toReturn);
