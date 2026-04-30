@@ -123,6 +123,7 @@ LinkedList_LinkedList_str BiGramHolder__generateSentences(BiGramHolder holder, s
 			int lastNextWordForListCopy = LinkedList__length(str, possibleNextWords) - 1;
 			
 			if (lastNextWordForListCopy < 0) {
+				LinkedList__append(LinkedList_str, toReplaceToReturn, subList);
 				continue;
 			}
 			
