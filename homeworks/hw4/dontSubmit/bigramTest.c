@@ -44,7 +44,7 @@ int main(int argc, char const *argv[])
 	
 	
 	
-	LinkedList_LinkedList_str sentences = BiGramHolder__generateSentences(holder, "the", 6, 2);
+	LinkedList_LinkedList_str sentences = BiGramHolder__generateSentences(holder, "the", 3, 2);
 	
 	printf("%d\n", LinkedList__length(LinkedList_str, sentences));
 	

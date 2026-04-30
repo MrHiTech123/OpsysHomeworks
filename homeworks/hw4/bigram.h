@@ -76,9 +76,7 @@ str joinAll(LinkedList_str toJoin) {
 	return toReturn;
 }
 
-LinkedList_str BiGramHolder__rankTopNextWords(BiGramHolder holder, str currentWord, int wordsToRank) {
-	printf("Find words %s, %d\n", currentWord, wordsToRank);
-	
+LinkedList_str BiGramHolder__rankTopNextWords(BiGramHolder holder, str currentWord, int wordsToRank) {	
 	LinkedList_str toReturn = LinkedList__create;
 	
 	if (!BIGRAMHOLDER_CONTAINS(holder, currentWord)) {
@@ -116,12 +114,10 @@ LinkedList_LinkedList_str BiGramHolder__generateSentences(BiGramHolder holder, s
 	LinkedList__append(LinkedList_str, toReturn, rootList);
 	
 	for (int currentDepth = 0; currentDepth < depth; ++currentDepth) {
-		printf("Outer loop\n");
-		
+				
 		LinkedList_LinkedList_str toReplaceToReturn = LinkedList__create;
 		LinkedList__foreach(LinkedList_str, subList, toReturn) {
-			printf("Sublist loop\n");
-			
+						
 			str lastWord = LinkedList__getLast(str, subList);
 			LinkedList_str possibleNextWords = BiGramHolder__rankTopNextWords(holder, lastWord, breadth);
 			int lastNextWordForListCopy = LinkedList__length(str, possibleNextWords) - 1;
@@ -133,8 +129,7 @@ LinkedList_LinkedList_str BiGramHolder__generateSentences(BiGramHolder holder, s
 			
 			int currentBreadth = 0;
 			LinkedList__foreach(str, currentNextWord, possibleNextWords) {
-				printf("Next word loop\n");
-				
+								
 				if (currentBreadth < lastNextWordForListCopy) {
 					LinkedList_str currentCopy = LinkedList__copy(str, subList);
 										
