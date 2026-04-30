@@ -323,13 +323,13 @@ void appLayerProtocol(int listener, BiGramHolder bigrams) {
 		pthread_create(&threadId, NULL, appLayerProtocolThread, threadArgs);
 		
 		LinkedList__append(pthread_t, threadIds, threadId);
-		
-		// appLayerProtocolThread(&newsd);
 	}
 	
 	LinkedList__foreach(pthread_t, threadId, threadIds) {
 		pthread_join(threadId, NULL);
 	}
+	
+	printf("MAIN: shutting down after confirming 0 child threads running\n");
 	
 	LinkedList__free(pthread_t, threadIds);
 }
@@ -353,7 +353,6 @@ int main(int argc, char** argv)
 	
 	int listener = appLayerProtocolInit(port);
 	
-	// return 0;
 	appLayerProtocol(listener, bigrams);
 		
 	
