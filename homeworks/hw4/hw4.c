@@ -1,59 +1,102 @@
 #include <stdio.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <stdlib.h>
+#include <ctype.h>
 
 
+#include "mystring.h"
 #include "linkedlist.h"
+#include "linkedmap.h"
+DECLARE_LINKEDLIST_TYPE(char);
+// DECLARE_LINKEDLIST_TYPE(str);
+
+#define at(arr, i) *(arr + i)
+#define APOSTROPHE '\''
+
+LinkedList_str allStringsMarkedForFreeing = LinkedList__create;
 
 
+void settings() {
+    // struct rlimit rl;
+    // getrlimit(RLIMIT_NPROC, &rl);
+    // rl.rlim_cur = 32;
+    // setrlimit(RLIMIT_NPROC, &rl);
+    setvbuf(stdout, NULL, _IONBF, 0);
+}
 
-int main(int argc, char const *argv[])
-{
-	LinkedList_int myList = LinkedList__create;
+char readOneChar(int fd) {
+	char toReturn;
+	read(fd, &toReturn, 1);
+	return toReturn;
+}
+
+char* linkedList_char__toString(LinkedList_char list) {
+	str toReturn = calloc(list.length + 1, sizeof(char));
 	
+	int writingIndex = 0;
 	
-	LinkedList__append(int, myList, 1);
-	LinkedList__append(int, myList, 3);
-	LinkedList__append(int, myList, 5);
-	printf("Int list has length %d\n", myList.length);
-	
-	// printf("%d\n", __LINE__);
-	LinkedList__foreach(int, i, myList) {
-		printf("%d\n", i);
+	LinkedList__foreach(char, currentChar, list) {
+		at(toReturn, writingIndex) = currentChar;
+		++writingIndex;
 	}
 	
-	LinkedList__free(int, myList);
+	LinkedList__append(str, allStringsMarkedForFreeing, toReturn);
 	
-	LinkedList_str strings = LinkedList__create;
-	
-	LinkedList__append(str, strings, "Abcd");
-	LinkedList__append(str, strings, "Hello");
-	LinkedList__append(str, strings, "Jason");
-	LinkedList__append(str, strings, "Fourth thing");
-	
-	printf("String list has length %d\n", strings.length);
-	
-	LinkedList__foreach(str, currentWord, strings) {
-		printf("%s\n", currentWord);
-	}
-	
-	LinkedList__free(str, strings);
-	
-	LinkedList_str strings2 = LinkedList__create;
-	
-	// LinkedList_append(str, strings2, "I LIED");
-	
-	LinkedList__foreach(str, thing, strings2) {
-		printf("SHOULD NOT PRINT %s\n", thing);
-	}
-	
-	LinkedList__free(str, strings2);
-	
-	return 0;
+	return toReturn;
 }
 
 
+char* readWord(int fd) {
+	LinkedList_char wordSoFar = LinkedList__create;
+	
+	int apostrophesRead = 0;
+	while (1) {
+		char currentCharBeingRead = readOneChar(fd);
+		
+		if (isalpha(currentCharBeingRead)) {
+			LinkedList__append(char, wordSoFar, currentCharBeingRead);
+		}
+		else if (currentCharBeingRead == APOSTROPHE) {
+			++apostrophesRead;
+			if (apostrophesRead > 1) {
+				break;
+			}
+		}
+		else {
+			break;
+		}
+		
+	}
+	
+	str toReturn = linkedList_char__toString(wordSoFar);
+	
+	LinkedList__free(char, wordSoFar);
+	
+	return toReturn;
+	
+}
+
+void freeAllStrings() {
+	LinkedList__foreach(str, toDelete, allStringsMarkedForFreeing) {
+		free(toDelete);
+	}
+	LinkedList__free(str, allStringsMarkedForFreeing);
+}
 
 
-
-
-
-
+int main(int argc, char** argv)
+{
+	settings();
+	str inputFileName = at(argv, 1);
+	int inputFile = open(inputFileName, O_RDONLY);
+	
+	str word = readWord(inputFile);
+	printf("%s\n", word);
+	
+	
+	
+	
+	freeAllStrings();
+	return 0;
+}
