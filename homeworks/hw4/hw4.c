@@ -133,7 +133,8 @@ void ensureBytesReadOverNetwork(int fd, int bytesToRead, void* buffer) {
 }
 
 void addDataToBigrams(char* data) {
-	printf("TODO: Add data %s to bigrams\n", data);
+	
+	printf("THREAD: extracted %d bigrams\n", 0);
 }
 
 int appLayerProtocolInit(unsigned short port) {
@@ -218,7 +219,7 @@ void* appLayerProtocolThread(void* argsPtr) {
 				sendStringMessage(newsd, toSend);
 				
 				
-				printf("Generate\n");
+				printf("THREAD: Sent response with %d phrases.\n", 0);
 				break;
 			case INSTRUCTION_TYPE_CLOSE:
 				printf("THREAD: rcvd 'C' CLOSE request\n");
@@ -249,7 +250,7 @@ void appLayerProtocol(int listener) {
 
 		printf( "MAIN: Blocked on accept()\n" );
 		int newsd = accept( listener, (struct sockaddr *)&remote_client, (socklen_t *)&addrlen );
-		if ( newsd == -1 ) { perror( "accept() failed" ); continue; }
+		if ( newsd == -1 && !shutDownFlag ) { perror( "accept() failed" ); continue; }
 		
 		printf( "MAIN: Accepted new client connection on newsd %d\n", newsd );
 		
@@ -291,7 +292,6 @@ int main(int argc, char** argv)
 	
 	
 	int listener = appLayerProtocolInit(port);
-	printf("%d\n", listener);
 	
 	// return 0;
 	appLayerProtocol(listener);
