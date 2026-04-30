@@ -201,6 +201,12 @@ void* appLayerProtocol(void* listenerPtr) {
 				case INSTRUCTION_TYPE_GENERATE:
 					short breadth, depth;
 					
+					ensureBytesReadOverNetwork(newsd, sizeof(int), &breadth);
+					breadth = ntohs(breadth);
+					ensureBytesReadOverNetwork(newsd, sizeof(int), &depth);
+					depth = ntohs(depth);
+					
+					printf("THREAD: rcvd 'G' GENERATE request with depth %d and breadth %d\n", breadth, depth);
 					
 					
 					str toSend = "Phrases delineated by \n chars\n\n";
