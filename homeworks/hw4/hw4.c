@@ -124,7 +124,7 @@ int BiGramHolder__getTimes(BiGramHolder holder, str firstWord, str secondWord) {
 
 str joinAll(LinkedList_str toJoin) {
 	int listLen = LinkedList__length(str, toJoin);
-	int stringLen = listLen + 1;
+	int stringLen = listLen;
 	LinkedList__foreach(str, word, toJoin) {
 		stringLen += strlen(word);
 	}
@@ -138,6 +138,8 @@ str joinAll(LinkedList_str toJoin) {
 		*(toReturn + currentIndex) = ' ';
 		++currentIndex;
 	}
+	
+	*(toReturn + stringLen - 1) = '\0';
 		
 	return toReturn;
 }
