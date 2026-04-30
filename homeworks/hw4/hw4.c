@@ -130,6 +130,7 @@ int main(int argc, char** argv)
 	
 	
 	LinkedList__free(str, words);
+	BiGramHolder__free(bigrams);
 	freeAllStrings();
 	return 0;
 }

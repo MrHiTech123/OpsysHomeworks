@@ -11,13 +11,13 @@ typedef LinkedMap_str_LinkedMap_str_int* BiGramHolder;
 
 #define BIGRAMHOLDER_CONTAINS(holder, key) LinkedMap__containsKey(str, LinkedMap_str_int, (*holder), key, equals_str)
 #define BIGRAMHOLDER_FIND(holder, key) LinkedMap__find(str, LinkedMap_str_int, (*holder), key, equals_str)
-#define BIGRAMHOLDER_FOREACHKEY(varName, holder) LinkedList__foreach(LinkedMapDataStruct_str_LinkedMap_str_int, varName, (*holder))
+#define BIGRAMHOLDER_FOREACH(varName, holder) LinkedList__foreach(LinkedMapDataStruct_str_LinkedMap_str_int, varName, (*holder))
 #define BIGRAMHOLDER_INSERT(holder, firstWord, value) LinkedMap__insert(str, LinkedMap_str_int, (*holder), firstWord, value);
 
 
 void BiGramHolder__display(BiGramHolder holder) {
 	printf("Displaying bigram holder!\n");
-	BIGRAMHOLDER_FOREACHKEY(s, holder) {
+	BIGRAMHOLDER_FOREACH(s, holder) {
 		printf("%s\n", s.key);
 		LinkedList__foreach(LinkedMapDataStruct_str_int, i, s.value) {
 			printf("\t%s %d\n", i.key, i.value);
@@ -68,6 +68,14 @@ BiGramHolder BiGramHolder__create(LinkedList_str words) {
 	}
 	
 	return toReturn;
+}
+
+void BiGramHolder__free(BiGramHolder holder) {
+	BIGRAMHOLDER_FOREACH(dataStruct, holder) {
+		LinkedMap__free(str, int, dataStruct.value);
+	}
+	LinkedMap__free(str, LinkedMap_str_int, (*holder));
+	free(holder);
 }
 
 
