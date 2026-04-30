@@ -37,6 +37,16 @@ int main(int argc, char const *argv[])
 	
 	printf("%s\n", joinAll(words));
 	
+	LinkedList_LinkedList_str sentences = BiGramHolder__generateSentences(holder, "the", 3, 1);
+	
+	// printf("%d\n", LinkedList__length(LinkedList_str, sentences));
+	
+	// LinkedList__foreach(LinkedList_str, currentList, sentences) {
+	// 	printf("%s\n", joinAll(currentList));
+	// }
+	
+	
+	
 	return 0;
 }
 

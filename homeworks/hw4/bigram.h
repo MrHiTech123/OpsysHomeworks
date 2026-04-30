@@ -1,10 +1,12 @@
 #ifndef _BIGRAM
 #define _BIGRAM
+#include <stdio.h>
 
 #include "mystring.h"
 #include "linkedmap.h"
 
 DECLARE_LINKEDLIST_TYPE(str);
+DECLARE_LINKEDLIST_TYPE(LinkedList_str);
 DECLARE_LINKEDMAP_TYPE(str, int);
 DECLARE_LINKEDMAP_TYPE(str, LinkedMap_str_int);
 typedef LinkedMap_str_LinkedMap_str_int* BiGramHolder;
@@ -73,11 +75,20 @@ str joinAll(LinkedList_str toJoin) {
 }
 
 LinkedList_str BiGramHolder__rankTopNextWords(BiGramHolder holder, str currentWord, int wordsToRank) {
-	LinkedMap_str_int location = BIGRAMHOLDER_FIND(holder, currentWord);
-	
+	printf("Find words %s, %d\n", currentWord, wordsToRank);
 	
 	LinkedList_str toReturn = LinkedList__create;
-	for (int i = 0; i < wordsToRank; ++i) {
+	
+	if (!BIGRAMHOLDER_CONTAINS(holder, currentWord)) {
+		return toReturn;
+	}
+	
+	LinkedMap_str_int location = BIGRAMHOLDER_FIND(holder, currentWord);
+	int locationLen = LinkedList__length(LinkedMapDataStruct_str_int, location);
+	
+	
+	
+	for (int i = 0; i < wordsToRank && i < locationLen; ++i) {
 		str toAdd = NULL;
 		int mostAmounts = 0;
 		
@@ -92,7 +103,55 @@ LinkedList_str BiGramHolder__rankTopNextWords(BiGramHolder holder, str currentWo
 	}
 	
 	return toReturn;
+}
+
+
+
+LinkedList_LinkedList_str BiGramHolder__generateSentences(BiGramHolder holder, str rootWord, int breadth, int depth) {
+	LinkedList_LinkedList_str toReturn = LinkedList__create;
+	LinkedList_str rootList = LinkedList__create;
+	LinkedList__append(str, rootList, rootWord);
+	LinkedList__append(LinkedList_str, toReturn, rootList);
 	
+	for (int currentDepth = 0; currentDepth < depth; ++currentDepth) {
+		printf("Outer loop\n");
+		
+		LinkedList_LinkedList_str toReplaceToReturn = LinkedList__create;
+		LinkedList__foreach(LinkedList_str, subList, toReturn) {
+			printf("Sublist loop\n");
+			
+			str lastWord = LinkedList__getLast(str, subList);
+			LinkedList_str possibleNextWords = BiGramHolder__rankTopNextWords(holder, lastWord, breadth);
+			int lastNextWordForListCopy = LinkedList__length(str, possibleNextWords) - 1;
+			
+			if (lastNextWordForListCopy < 0) {
+				continue;
+			}
+			
+			
+			int currentBreadth = 0;
+			LinkedList__foreach(str, currentNextWord, possibleNextWords) {
+				printf("Next word loop\n");
+				if (currentBreadth < lastNextWordForListCopy) {
+					LinkedList_str currentCopy = LinkedList__copy(str, subList);
+										
+					LinkedList__append(str, currentCopy, currentNextWord);
+					LinkedList__append(LinkedList_str, toReplaceToReturn, currentCopy);
+				}
+				++currentBreadth;
+			}
+			
+			LinkedList__append(str, subList, LinkedList__getLast(str, possibleNextWords));
+			LinkedList__append(LinkedList_str, toReplaceToReturn, subList);
+		}
+		
+		LinkedList__free(LinkedList_str, toReturn);
+		toReturn = toReplaceToReturn;
+		
+	}
+	
+	
+	return toReturn;
 	
 }
 
