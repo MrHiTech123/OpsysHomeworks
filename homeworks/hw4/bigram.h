@@ -56,10 +56,12 @@ int BiGramHolder__getTimes(BiGramHolder holder, str firstWord, str secondWord) {
 
 str joinAll(LinkedList_str toJoin) {
 	int listLen = LinkedList__length(str, toJoin);
-	int stringLen = listLen;
+	int stringLen = listLen + 1;
 	LinkedList__foreach(str, word, toJoin) {
 		stringLen += strlen(word);
 	}
+	
+	printf("%d\n", stringLen);
 	
 	str toReturn = calloc(stringLen, sizeof(char));
 	int currentIndex = 0;
@@ -132,6 +134,7 @@ LinkedList_LinkedList_str BiGramHolder__generateSentences(BiGramHolder holder, s
 			int currentBreadth = 0;
 			LinkedList__foreach(str, currentNextWord, possibleNextWords) {
 				printf("Next word loop\n");
+				
 				if (currentBreadth < lastNextWordForListCopy) {
 					LinkedList_str currentCopy = LinkedList__copy(str, subList);
 										
