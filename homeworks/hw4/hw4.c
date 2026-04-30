@@ -40,8 +40,7 @@ char readOneChar(int fd) {
 }
 
 char* linkedList_char__toString(LinkedList_char list) {
-	str toReturn = calloc(list.length + 1, sizeof(char));
-	
+	str toReturn = calloc(LinkedList__length(char, list) + 1, sizeof(char));
 	int writingIndex = 0;
 	
 	LinkedList__foreach(char, currentChar, list) {
@@ -127,7 +126,7 @@ int main(int argc, char** argv)
 	
 	printf("%d\n", BiGramHolder__getTimes(bigrams, "are", "they"));
 	printf("%d\n", BiGramHolder__getTimes(bigrams, "are", "they'n"));
-	printf("%d\n", LinkedMap__containsKey(str, LinkedMap_str_int, bigrams, "are", equals));
+	printf("%d\n", LinkedMap__containsKey(str, LinkedMap_str_int, (*bigrams), "are", equals));
 	
 	
 	LinkedList__free(str, words);
