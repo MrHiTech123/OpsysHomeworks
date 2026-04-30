@@ -139,6 +139,8 @@ void freeAllStrings() {
 #define INSTRUCTION_TYPE_CLOSE 'C'
 #define INSTRUCTION_TYPE_SHUTDOWN 'X'
 
+pthread_mutex_t BIGRAM_HOLDER_MUTEX = PTHREAD_MUTEX_INITIALIZER;
+
 bool shutDownFlag = false;
 
 void ensureBytesReadOverNetwork(int fd, int bytesToRead, void* buffer) {
@@ -150,9 +152,15 @@ void ensureBytesReadOverNetwork(int fd, int bytesToRead, void* buffer) {
 	}
 }
 
-void addDataToBigrams(char* data) {
+void addDataToBigrams(char* data, BiGramHolder bigrams) {
+	LinkedList_str words = readAllWordsFromString(data);
+	printf("THREAD: extracted %d bigrams\n", LinkedList__length(str, words));
 	
-	printf("THREAD: extracted %d bigrams\n", 0);
+	pthread_mutex_lock(&BIGRAM_HOLDER_MUTEX);
+	BiGramHolder__addAll(bigrams, words);
+	pthread_mutex_unlock(&BIGRAM_HOLDER_MUTEX);
+	
+	LinkedList__free(str, words);
 }
 
 int appLayerProtocolInit(unsigned short port) {
@@ -195,13 +203,15 @@ void sendOKResponse(int newsd) {
 	printf("THREAD: sent OK response\n");
 }
 
-typedef struct {int listener; int newsd;} appLayerProtocolThreadArgs;
+typedef struct {int listener; int newsd; BiGramHolder bigrams;} appLayerProtocolThreadArgs;
 
 
 void* appLayerProtocolThread(void* argsPtr) {
 	appLayerProtocolThreadArgs* args = (appLayerProtocolThreadArgs*)argsPtr;
 	int listener = args->listener;
 	int newsd = args->newsd;
+	BiGramHolder bigrams = args->bigrams;
+	
 	free(argsPtr);
 	int n = 1;
 	while (n > 0) {
@@ -217,7 +227,7 @@ void* appLayerProtocolThread(void* argsPtr) {
 				char* readData = calloc(length + 1, sizeof(char));
 				
 				ensureBytesReadOverNetwork(newsd, length, readData);
-				addDataToBigrams(readData);
+				addDataToBigrams(readData, bigrams);
 				
 				sendOKResponse(newsd);
 				
@@ -259,7 +269,7 @@ void* appLayerProtocolThread(void* argsPtr) {
 	return NULL;
 }
 
-void appLayerProtocol(int listener) {
+void appLayerProtocol(int listener, BiGramHolder bigrams) {
 	LinkedList_pthread_t threadIds = LinkedList__create;
 	
 	while (!shutDownFlag) {
@@ -282,6 +292,7 @@ void appLayerProtocol(int listener) {
 		appLayerProtocolThreadArgs* threadArgs = calloc(1, sizeof(appLayerProtocolThreadArgs));
 		threadArgs->listener = listener;
 		threadArgs->newsd = newsd;
+		threadArgs->bigrams = bigrams;
 		
 		pthread_create(&threadId, NULL, appLayerProtocolThread, threadArgs);
 		
@@ -317,7 +328,7 @@ int main(int argc, char** argv)
 	int listener = appLayerProtocolInit(port);
 	
 	// return 0;
-	appLayerProtocol(listener);
+	appLayerProtocol(listener, bigrams);
 	
 	
 	
