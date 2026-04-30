@@ -27,7 +27,6 @@ void BiGramHolder__display(BiGramHolder holder) {
 
 void BiGramHolder__add(BiGramHolder holder, str key, str value) {
 	if (!BIGRAMHOLDER_CONTAINS(holder, key)) {
-		printf("Inserting %s: %s\n", key, value);
 		LinkedMap_str_int toAdd = LinkedMap__create;
 		BIGRAMHOLDER_SET(holder, key, toAdd);
 	}
@@ -42,9 +41,7 @@ void BiGramHolder__add(BiGramHolder holder, str key, str value) {
 	
 	LinkedMap__set(str, int, locationToAdd, value, valueToAdd, equals_str);
 	BIGRAMHOLDER_SET(holder, key, locationToAdd);
-	// printf("%s %s %d %d\n", key, value, LinkedMap__find(str, int, locationToAdd, value, equals_str), LinkedMap__find(str, int, BIGRAMHOLDER_FIND(holder, key), value, equals_str));
 	
-	printf("First\n");	
 }
 
 int BiGramHolder__getTimes(BiGramHolder holder, str firstWord, str secondWord) {
@@ -53,7 +50,6 @@ int BiGramHolder__getTimes(BiGramHolder holder, str firstWord, str secondWord) {
 		return 0;
 	}
 	
-	// printf("d %d\n", location.first->value.value);
 	return LinkedMap__find(str, int, location, secondWord, equals_str);
 }
 
@@ -64,7 +60,6 @@ BiGramHolder BiGramHolder__create(LinkedList_str words) {
 	LinkedList__foreach(str, word, words) {
 		if (prev != NULL) {
 			BiGramHolder__add(toReturn, prev, word);
-			BiGramHolder__display(toReturn);
 		}				
 		prev = word;
 		continue;
