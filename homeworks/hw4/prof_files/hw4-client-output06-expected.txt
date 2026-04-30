@@ -1,0 +1,12 @@
+CLIENT: connected to server
+CLIENT: sending 'G' message (7 bytes) to server...
+CLIENT: received 22 bytes, as expected:
+i didn't know a fox
+
+
+<end-of-transmission>
+CLIENT: sending 'X' message (1 byte) to server...
+CLIENT: received 4 bytes, as expected:
+OK
+
+<end-of-transmission>

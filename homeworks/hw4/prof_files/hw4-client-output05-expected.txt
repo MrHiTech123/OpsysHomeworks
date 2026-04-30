@@ -1,0 +1,22 @@
+CLIENT: connected to server
+CLIENT: sending '+' message (39 bytes) to server...
+CLIENT: received 4 bytes, as expected:
+OK
+
+<end-of-transmission>
+CLIENT: sending 'G' message (9 bytes) to server...
+CLIENT: received 105 bytes, as expected:
+the quick brown fox
+the quick dog jumps
+the quick dog wow
+the lazy dog jumps
+the lazy dog wow
+the moon
+
+
+<end-of-transmission>
+CLIENT: sending 'C' message (1 byte) to server...
+CLIENT: received 4 bytes, as expected:
+OK
+
+<end-of-transmission>

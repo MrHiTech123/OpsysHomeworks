@@ -1,0 +1,11 @@
+MAIN: extracted 17 words (16 bigrams) from hw4-input04.txt
+MAIN: blocked on accept()
+MAIN: new connection established
+MAIN: blocked on accept()
+THREAD: rcvd '+' ADD request of length 34 bytes
+THREAD: extracted 6 bigrams
+THREAD: sent OK response
+THREAD: rcvd 'G' GENERATE request with depth 4 and breadth 3
+THREAD: sent response with 6 phrases
+THREAD: rcvd 'C' CLOSE request
+THREAD: sent OK response

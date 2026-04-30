@@ -1,0 +1,20 @@
+CLIENT: connected to server
+CLIENT: sending '+' message (55 bytes) to server...
+CLIENT: received 4 bytes, as expected:
+OK
+
+<end-of-transmission>
+CLIENT: sending 'G' message (7 bytes) to server...
+CLIENT: received 98 bytes, as expected:
+i guess i'll hafta sleep
+i guess i'll never learn
+i now i'll hafta sleep
+i now i'll never learn
+
+
+<end-of-transmission>
+CLIENT: sending 'C' message (1 byte) to server...
+CLIENT: received 4 bytes, as expected:
+OK
+
+<end-of-transmission>
