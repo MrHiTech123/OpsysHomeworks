@@ -1,51 +1,289 @@
-MAIN: Blocked on accept()
-MAIN: Accepted new client connection on newsd 5
-MAIN: Blocked on accept()
-THREAD: rcvd '+' ADD request of length 34 bytes
+MAIN: extracted 184 words (183 bigrams) from prof_files/hw4-input07.txt
+MAIN: blocked on accept()
+MAIN: new connection established
+MAIN: blocked on accept()
+THREAD: rcvd '+' ADD request of length 45 bytes
 THREAD: extracted 7 bigrams
 THREAD: sent OK response
-THREAD: rcvd 'G' GENERATE request with depth 3 and breadth 4
-THREAD: Sent response with 0 phrases.
-THREAD: rcvd 'X' SHUTDOWN request
-THREAD: sent OK response
 Displaying bigram holder!
-move'n
-	t 1
-t
-	row 1
-	yes 1
-row
-	size 1
-size
+once
+	when 1
+when
+	a 1
+a
+	lion 1
+	little 1
+	turn 1
+	trap 1
+	tree 1
+	wagon 1
+lion
+	was 4
+	who 1
+was
+	asleep 1
+	so 1
+	caught 1
+	went 1
+	i 1
+asleep
+	a 1
+little
+	mouse 4
+	friends 1
+mouse
+	began 1
+	forgive 1
+	being 1
+	happened 1
+	little 1
+began
+	running 1
+running
+	up 1
+up
+	and 1
+	his 1
+	to 1
+and
+	down 1
+	opened 1
+	let 1
+	the 1
+	seeing 1
+	soon 1
+down
+	upon 1
+upon
+	him 2
+him
+	this 1
+	and 2
+	pardon 1
+	that 1
+	go 1
+	alive 1
+	to 1
+	on 1
+this
+	soon 1
+	time 1
+soon
+	wakened 1
+	gnawed 1
+wakened
+	the 1
+the
+	lion 4
+	little 3
+	idea 1
+	mouse 1
+	hunters 1
+	king 2
+	sad 1
+	ropes 1
+	beasts 1
+who
+	placed 1
+	knows 1
+	desired 1
+placed
+	his 1
+his
+	huge 1
+	big 1
+	paw 1
+huge
+	paw 1
+paw
+	upon 1
+	and 1
+opened
+	his 1
+big
+	jaws 1
+jaws
+	to 1
+to
+	swallow 1
+	do 1
+	help 1
+	carry 2
+	the 1
+	a 1
+	pass 1
+	him 1
+swallow
+	him 1
+pardon
+	o 1
+o
+	king 1
+king
+	cried 1
+	tied 1
+	of 1
+cried
+	the 1
+forgive
+	me 1
+me
+	this 1
+time
+	i 1
+	after 1
+i
+	shall 1
+	may 1
+	not 1
+shall
+	never 1
+never
+	forget 1
+forget
+	it 1
+it
+	who 1
+knows
+	but 1
+but
+	what 1
+what
+	i 1
+may
+	be 1
+	prove 1
+	carry 1
+be
+	able 1
+able
+	to 2
+do
+	you 1
+you
+	a 1
+	forward 1
+turn
+	some 1
+some
+	of 1
+	time 1
+of
 	these 1
+	the 2
+	a 1
 these
-	are 1
-are
-	my 1
-	they'n 1
-my
-	awesome 1
-awesome
-	words 1
-words
-	aren't 1
-aren't
+	days 1
+days
+	the 1
+so
+	tickled 1
+tickled
+	at 1
+at
+	the 1
+idea
+	of 1
+being
+	able 1
+help
+	him 1
+that
+	he 1
+	bound 1
+he
+	lifted 1
+lifted
+	up 1
+let
+	him 1
+go
+	some 1
+after
+	the 1
+caught
+	in 1
+in
+	a 1
+	search 1
+	which 1
+	life 1
+trap
+	and 1
+hunters
+	who 1
+desired
+	to 1
+carry
+	him 2
+	you 1
+alive
+	to 1
+tied
+	him 1
+tree
+	while 1
+while
 	they 1
 they
-	are 2
-	yes 1
-they'n
-	t 1
-yes
-	they 2
-the
-	quick 1
-	moon 1
-quick
-	dog 1
-dog
-	jumps 1
-jumps
-	over 1
-over
+	went 1
+went
+	in 1
+	up 1
+search
+	of 1
+wagon
+	to 1
+on
+	just 1
+just
+	then 1
+then
 	the 1
+happened
+	to 1
+pass
+	by 1
+by
+	and 1
+seeing
+	the 1
+sad
+	plight 1
+plight
+	in 1
+which
+	the 1
+gnawed
+	away 1
+away
+	the 1
+ropes
+	that 1
+bound
+	the 1
+beasts
+	was 1
+not
+	right 1
+right
+	said 1
+said
+	the 1
+friends
+	may 1
+prove
+	great 1
+great
+	friends 1
+aesop's
+	fables 1
+fables
+	may 1
+forward
+	in 1
+THREAD: rcvd 'G' GENERATE request with depth 7 and breadth 2
+THREAD: sent response with 8 phrases
+THREAD: rcvd 'X' SHUTDOWN request
+THREAD: sent OK response
+MAIN: shutting down after confirming 0 child threads running

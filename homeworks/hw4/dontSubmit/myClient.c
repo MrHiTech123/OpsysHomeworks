@@ -179,6 +179,8 @@ int main(int argc, char** argv)
   sendAddRequest(sd, "Aesop's Fables may carry you forward in life!");
   printf("Generating...\n");
   sendGenerateRequest(sd, 2, 7, "may");
+  
+  sendShutdownRequest(sd);
 
   return EXIT_SUCCESS;
 }

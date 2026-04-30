@@ -532,6 +532,8 @@ void* appLayerProtocolThread(void* argsPtr) {
 			case INSTRUCTION_TYPE_GENERATE:
 				short breadth, depth;
 				
+				BiGramHolder__display(bigrams);
+				
 				
 				ensureBytesReadOverNetwork(newsd, sizeof(short), &breadth);
 				breadth = ntohs(breadth);
