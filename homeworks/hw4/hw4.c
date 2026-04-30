@@ -144,6 +144,30 @@ str joinAll(LinkedList_str toJoin) {
 	return toReturn;
 }
 
+bool alphabeticallyBefore(str first, str second) {
+	for (
+		char *currentCharLocationFirst = first, *currentCharLocationSecond = second;;
+		++currentCharLocationFirst, ++currentCharLocationSecond) {
+		if (!*currentCharLocationFirst) {
+			return true;
+		}
+		
+		if (!*currentCharLocationSecond) {
+			return false;
+		}
+		
+		if (*currentCharLocationFirst < *currentCharLocationSecond) {
+			return true;
+		}
+		
+		if (*currentCharLocationFirst > *currentCharLocationSecond) {
+			return false;
+		}
+	}
+	
+	return false;
+}
+
 LinkedList_str BiGramHolder__rankTopNextWords(BiGramHolder holder, str currentWord, int wordsToRank) {	
 	LinkedList_str toReturn = LinkedList__create;
 	
@@ -161,7 +185,12 @@ LinkedList_str BiGramHolder__rankTopNextWords(BiGramHolder holder, str currentWo
 		int mostAmounts = 0;
 		
 		LinkedList__foreach(LinkedMapDataStruct_str_int, wordAndFrequency, location) {
-			if (wordAndFrequency.value > mostAmounts && !LinkedList__contains(str, toReturn, wordAndFrequency.key, equals_str)) {
+			if (
+				(
+					wordAndFrequency.value > mostAmounts || 
+					(wordAndFrequency.value == mostAmounts && alphabeticallyBefore(wordAndFrequency.key, toAdd))
+				)
+				&& !LinkedList__contains(str, toReturn, wordAndFrequency.key, equals_str)) {
 				toAdd = wordAndFrequency.key;
 				mostAmounts = wordAndFrequency.value;
 			}

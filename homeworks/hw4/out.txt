@@ -283,7 +283,7 @@ fables
 forward
 	in 1
 THREAD: rcvd 'G' GENERATE request with depth 7 and breadth 2
-THREAD: sent response with 8 phrases
+THREAD: sent response with 25 phrases
 THREAD: rcvd 'X' SHUTDOWN request
 THREAD: sent OK response
 MAIN: shutting down after confirming 0 child threads running
