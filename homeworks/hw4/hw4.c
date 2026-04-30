@@ -6,6 +6,7 @@
 typedef char* str;
 
 #define equals_str(s1, s2) !strcmp(s1, s2)
+#define pluralize(amount) (amount == 1)? "" : "s"
 
 #endif
 
@@ -418,7 +419,8 @@ void ensureBytesReadOverNetwork(int fd, int bytesToRead, void* buffer) {
 
 void addDataToBigrams(char* data, BiGramHolder bigrams) {
 	LinkedList_str words = readAllWordsFromString(data);
-	printf("THREAD: extracted %d bigrams\n", LinkedList__length(str, words) - 1);
+	int bigrams = LinkedList__length(str, words) - 1;
+	printf("THREAD: extracted %d bigram%s\n", bigrams, pluralize(bigrams));
 	
 	pthread_mutex_lock(&BIGRAM_HOLDER_MUTEX);
 		BiGramHolder__addAll(bigrams, words);
@@ -498,7 +500,7 @@ void* appLayerProtocolThread(void* argsPtr) {
 				ensureBytesReadOverNetwork(newsd, sizeof(int), &length);
 				
 				length = ntohl(length);
-				printf("THREAD: rcvd '+' ADD request of length %d bytes\n", length);
+				printf("THREAD: rcvd '+' ADD request of length %d byte%s\n", length, pluralize(length));
 				char* readData = calloc(length + 1, sizeof(char));
 				
 				ensureBytesReadOverNetwork(newsd, length, readData);
@@ -529,7 +531,8 @@ void* appLayerProtocolThread(void* argsPtr) {
 				
 				sendSentenceCollection(newsd, sentences);
 				
-				printf("THREAD: Sent response with %d phrases.\n", LinkedList__length(LinkedList_str, sentences));
+				int phrases = LinkedList__length(LinkedList_str, sentences);
+				printf("THREAD: Sent response with %d phrase%s.\n", phrases, pluralize(phrases));
 				
 				LinkedList__foreach(LinkedList_str, toBeFreed, sentences) {
 					LinkedList__free(str, toBeFreed);
@@ -615,7 +618,7 @@ int main(int argc, char** argv)
 	
 	
 	int wordsLen = LinkedList__length(str, words);
-	printf("MAIN: extracted %d words (%d bigrams) from %s", wordsLen, wordsLen - 1, inputFileName);
+	printf("MAIN: extracted %d word%s (%d bigram%s) from %s", wordsLen, pluralize(wordsLen), wordsLen - 1, pluralize(wordsLen - 1), inputFileName);
 	
 	int listener = appLayerProtocolInit(port);
 	
