@@ -467,12 +467,11 @@ void sendStringMessage(int newsd, str toSend) {
 }
 
 void* timerThread() {
-	int time = 0;
-	while (1) {
+	for (int time = 0; time < 15; ++time) {
 		printf("Time = %d\n", time);
 		sleep(1);
-		++time;
 	}
+	return NULL;
 }
 
 pthread_t startTimerThread() {
@@ -619,7 +618,7 @@ void appLayerProtocol(int listener, BiGramHolder bigrams) {
 		pthread_join(threadId, NULL);
 	}
 	
-	pthread_cancel(timerThreadId);
+	pthread_join(timerThreadId, NULL);
 	
 	printf("MAIN: shutting down after confirming 0 child threads running\n");
 	
