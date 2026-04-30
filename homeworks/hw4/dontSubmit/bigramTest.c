@@ -26,9 +26,7 @@ int main(int argc, char const *argv[])
 	
 	for (int i = 1; i <= 5; ++i) {
 		LinkedList_str nextWords = BiGramHolder__rankTopNextWords(holder, "the", i);
-		
-		printf("Number %d\n");
-		
+				
 		LinkedList__foreach(str, word, nextWords) {
 			printf("\t%s\n", word);
 		}
@@ -46,7 +44,7 @@ int main(int argc, char const *argv[])
 	
 	
 	
-	LinkedList_LinkedList_str sentences = BiGramHolder__generateSentences(holder, "the", 6, 1);
+	LinkedList_LinkedList_str sentences = BiGramHolder__generateSentences(holder, "the", 6, 2);
 	
 	printf("%d\n", LinkedList__length(LinkedList_str, sentences));
 	
@@ -54,6 +52,11 @@ int main(int argc, char const *argv[])
 		printf("%s\n", joinAll(currentList));
 	}
 	
+	LinkedList__foreach(LinkedList_str, subList, sentences) {
+		LinkedList__free(str, subList);
+	}
+	
+	LinkedList__free(LinkedList_str, sentences);
 	
 	BiGramHolder__free(holder);
 	free(sentence);
