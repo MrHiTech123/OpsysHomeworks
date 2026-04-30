@@ -533,7 +533,7 @@ void* appLayerProtocolThread(void* argsPtr) {
 				sendSentenceCollection(newsd, sentences);
 				
 				int phrases = LinkedList__length(LinkedList_str, sentences);
-				printf("THREAD: Sent response with %d phrase%s\n", phrases, pluralize(phrases));
+				printf("THREAD: sent response with %d phrase%s\n", phrases, pluralize(phrases));
 				
 				LinkedList__foreach(LinkedList_str, toBeFreed, sentences) {
 					LinkedList__free(str, toBeFreed);
