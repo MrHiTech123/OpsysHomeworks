@@ -119,6 +119,8 @@ void freeAllStrings() {
 #define INSTRUCTION_TYPE_CLOSE 'C'
 #define INSTRUCTION_TYPE_SHUTDOWN 'X'
 
+bool shutDownFlag = false;
+
 void ensureBytesReadOverNetwork(int fd, int bytesToRead, void* buffer) {
 	int totalBytesRead = 0;
 	int n;
@@ -163,61 +165,86 @@ int appLayerProtocolInit(unsigned short port) {
 	return listener;
 }
 
-void* appLayerProtocol(void* listenerPtr) {
-	int listener = *(int*)listenerPtr;
-	while (1) {
-		printf("Start\n");
+void sendStringMessage(int newsd, str toSend) {				
+	send(newsd, toSend, strlen(toSend), 0);
+}
+
+void sendOKResponse(int newsd) {
+	sendStringMessage(newsd, "OK\n\n");
+	printf("THREAD: sent OK response\n");
+}
+
+void* appLayerProtocolThread(void* newsdPtr) {
+	int newsd = *(int*)newsdPtr;
+	int n = 1;
+	while (n > 0) {
+		char instructionType;
+		n = recv(newsd, &instructionType, sizeof(char), 0);
+		switch (instructionType) {
+			case INSTRUCTION_TYPE_ADD:
+				int length;
+				ensureBytesReadOverNetwork(newsd, sizeof(int), &length);
+				
+				length = ntohl(length);
+				printf("THREAD: rcvd '+' ADD request of length %d bytes\n", length);
+				char* readData = calloc(length + 1, sizeof(char));
+				
+				ensureBytesReadOverNetwork(newsd, length, readData);
+				addDataToBigrams(readData);
+				
+				sendOKResponse(newsd);
+				
+				free(readData);
+				break;
+			case INSTRUCTION_TYPE_GENERATE:
+				short breadth, depth;
+				
+				ensureBytesReadOverNetwork(newsd, sizeof(short), &breadth);
+				breadth = ntohs(breadth);
+				ensureBytesReadOverNetwork(newsd, sizeof(short), &depth);
+				depth = ntohs(depth);
+				
+				printf("THREAD: rcvd 'G' GENERATE request with depth %d and breadth %d\n", breadth, depth);
+				
+				str toSend = "Phrases delineated by \n chars\n\n";
+				sendStringMessage(newsd, toSend);
+				
+				
+				printf("Generate\n");
+				break;
+			case INSTRUCTION_TYPE_CLOSE:
+				printf("THREAD: rcvd 'C' CLOSE request\n");
+				printf("%c char\n", instructionType);
+				sendOKResponse(newsd);
+				return NULL;
+				
+			case INSTRUCTION_TYPE_SHUTDOWN:
+				printf("THREAD: rcvd 'X' SHUTDOWN request\n");
+				printf("%c char\n", instructionType);
+				shutDownFlag = true;
+				sendOKResponse(newsd);
+				return NULL;
+				
+		}
+		
+	}
+	return NULL;
+}
+
+void appLayerProtocol(int listener) {
+	while (!shutDownFlag) {
 		struct sockaddr_in remote_client;
 		int addrlen = sizeof( remote_client );
 
-		printf( "SERVER: Blocked on accept()\n" );
+		printf( "MAIN: Blocked on accept()\n" );
 		int newsd = accept( listener, (struct sockaddr *)&remote_client, (socklen_t *)&addrlen );
 		if ( newsd == -1 ) { perror( "accept() failed" ); continue; }
 		
-		printf( "SERVER: Accepted new client connection on newsd %d\n", newsd );
+		printf( "MAIN: Accepted new client connection on newsd %d\n", newsd );
 		/* newsd is a newly assigned socket (file) descriptor that is tied to
 		 *  the new incoming TCP connection that has been established
 		 */
-		int n = 1;
-		while (n > 0) {
-			char instructionType;
-			n = recv(newsd, &instructionType, sizeof(char), 0);
-			switch (instructionType) {
-				case INSTRUCTION_TYPE_ADD:
-					int length;
-					ensureBytesReadOverNetwork(newsd, sizeof(int), &length);
-					
-					length = ntohl(length);
-					printf("THREAD: rcvd '+' ADD request of length %d bytes\n", length);
-					char* readData = calloc(length + 1, sizeof(char));
-					
-					ensureBytesReadOverNetwork(newsd, length, readData);
-					addDataToBigrams(readData);
-					
-					send(newsd, "OK\n\n", 4, 0);
-					
-					free(readData);
-					break;
-				case INSTRUCTION_TYPE_GENERATE:
-					short breadth, depth;
-					
-					ensureBytesReadOverNetwork(newsd, sizeof(int), &breadth);
-					breadth = ntohs(breadth);
-					ensureBytesReadOverNetwork(newsd, sizeof(int), &depth);
-					depth = ntohs(depth);
-					
-					printf("THREAD: rcvd 'G' GENERATE request with depth %d and breadth %d\n", breadth, depth);
-					
-					
-					str toSend = "Phrases delineated by \n chars\n\n";
-					
-					send(newsd, toSend, strlen(toSend), 0);
-					
-					printf("Generate\n");
-					
-			}
-			
-		}
+		appLayerProtocolThread(&newsd);
 	}
 	
 }
@@ -243,7 +270,7 @@ int main(int argc, char** argv)
 	printf("%d\n", listener);
 	
 	// return 0;
-	appLayerProtocol(&listener);
+	appLayerProtocol(listener);
 	
 	
 	
