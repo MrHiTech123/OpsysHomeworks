@@ -419,8 +419,8 @@ void ensureBytesReadOverNetwork(int fd, int bytesToRead, void* buffer) {
 
 void addDataToBigrams(char* data, BiGramHolder bigrams) {
 	LinkedList_str words = readAllWordsFromString(data);
-	int bigrams = LinkedList__length(str, words) - 1;
-	printf("THREAD: extracted %d bigram%s\n", bigrams, pluralize(bigrams));
+	int bigramsAmount = LinkedList__length(str, words) - 1;
+	printf("THREAD: extracted %d bigram%s\n", bigramsAmount, pluralize(bigramsAmount));
 	
 	pthread_mutex_lock(&BIGRAM_HOLDER_MUTEX);
 		BiGramHolder__addAll(bigrams, words);
@@ -513,16 +513,17 @@ void* appLayerProtocolThread(void* argsPtr) {
 			case INSTRUCTION_TYPE_GENERATE:
 				short breadth, depth;
 				
-				ensureBytesReadOverNetwork(newsd, sizeof(short), &depth);
-				depth = ntohs(depth);
+				
 				ensureBytesReadOverNetwork(newsd, sizeof(short), &breadth);
 				breadth = ntohs(breadth);
+				ensureBytesReadOverNetwork(newsd, sizeof(short), &depth);
+				depth = ntohs(depth);
 				
 				
 				char* word = readWordFromFile(newsd, NULL);
 				
 				
-				printf("THREAD: rcvd 'G' GENERATE request with depth %d and breadth %d\n", breadth, depth);
+				printf("THREAD: rcvd 'G' GENERATE request with depth %d and breadth %d\n", depth, breadth);
 				
 				pthread_mutex_lock(&BIGRAM_HOLDER_MUTEX);
 					LinkedList_LinkedList_str sentences = 
@@ -618,7 +619,7 @@ int main(int argc, char** argv)
 	
 	
 	int wordsLen = LinkedList__length(str, words);
-	printf("MAIN: extracted %d word%s (%d bigram%s) from %s", wordsLen, pluralize(wordsLen), wordsLen - 1, pluralize(wordsLen - 1), inputFileName);
+	printf("MAIN: extracted %d word%s (%d bigram%s) from %s\n", wordsLen, pluralize(wordsLen), wordsLen - 1, pluralize(wordsLen - 1), inputFileName);
 	
 	int listener = appLayerProtocolInit(port);
 	
