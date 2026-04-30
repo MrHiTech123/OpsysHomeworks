@@ -27,7 +27,10 @@ void settings() {
 
 char readOneChar(int fd) {
 	char toReturn;
-	read(fd, &toReturn, 1);
+	int charactersRead = read(fd, &toReturn, 1);
+	if (charactersRead == 0) {
+		return '\0';
+	}
 	return toReturn;
 }
 
@@ -47,7 +50,7 @@ char* linkedList_char__toString(LinkedList_char list) {
 }
 
 
-char* readWord(int fd) {
+char* readWord(int fd, bool* endOfFileFlag) {
 	LinkedList_char wordSoFar = LinkedList__create;
 	
 	int apostrophesRead = 0;
@@ -65,6 +68,9 @@ char* readWord(int fd) {
 			LinkedList__append(char, wordSoFar, currentCharBeingRead);
 		}
 		else {
+			if (endOfFileFlag && !currentCharBeingRead) {
+				*endOfFileFlag = true;
+			}
 			break;
 		}
 		
@@ -76,6 +82,20 @@ char* readWord(int fd) {
 	
 	return toReturn;
 	
+}
+
+LinkedList_str readAllWords(int fd) {
+	LinkedList_str toReturn = LinkedList__create;
+	
+	bool reachedEndOfFile = false;
+	while (!reachedEndOfFile) {
+		str currentWord = readWord(fd, &reachedEndOfFile);
+		if (strlen(currentWord)) {
+			LinkedList__append(str, toReturn, currentWord);
+		}
+	}
+	
+	return toReturn;
 }
 
 void freeAllStrings() {
@@ -92,12 +112,16 @@ int main(int argc, char** argv)
 	str inputFileName = at(argv, 1);
 	int inputFile = open(inputFileName, O_RDONLY);
 	
-	str word = readWord(inputFile);
-	printf("%s\n", word);
+	LinkedList_str words = readAllWords(inputFile);
+	
+	LinkedList__foreach(str, word, words) {
+		printf("String: %s\n", word);
+	}
 	
 	
 	
 	
+	LinkedList__free(str, words);
 	freeAllStrings();
 	return 0;
 }
