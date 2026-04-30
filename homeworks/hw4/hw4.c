@@ -62,6 +62,7 @@ char* readWord(int fd) {
 			if (apostrophesRead > 1) {
 				break;
 			}
+			LinkedList__append(char, wordSoFar, currentCharBeingRead);
 		}
 		else {
 			break;

@@ -1,4 +1,4 @@
-Move 1 row, size 3:
+Move'n't 1 row, size 3:
 
 
 1 -> 4
