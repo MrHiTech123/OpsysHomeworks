@@ -12,7 +12,7 @@ typedef LinkedMap_str_LinkedMap_str_int* BiGramHolder;
 #define BIGRAMHOLDER_CONTAINS(holder, key) LinkedMap__containsKey(str, LinkedMap_str_int, (*holder), key, equals_str)
 #define BIGRAMHOLDER_FIND(holder, key) LinkedMap__find(str, LinkedMap_str_int, (*holder), key, equals_str)
 #define BIGRAMHOLDER_FOREACH(varName, holder) LinkedList__foreach(LinkedMapDataStruct_str_LinkedMap_str_int, varName, (*holder))
-#define BIGRAMHOLDER_INSERT(holder, firstWord, value) LinkedMap__insert(str, LinkedMap_str_int, (*holder), firstWord, value);
+#define BIGRAMHOLDER_SET(holder, firstWord, value) LinkedMap__set(str, LinkedMap_str_int, (*holder), firstWord, value, equals_str);
 
 
 void BiGramHolder__display(BiGramHolder holder) {
@@ -27,7 +27,9 @@ void BiGramHolder__display(BiGramHolder holder) {
 
 void BiGramHolder__add(BiGramHolder holder, str key, str value) {
 	if (!BIGRAMHOLDER_CONTAINS(holder, key)) {
-		BIGRAMHOLDER_INSERT(holder, key, LinkedMap__create);
+		printf("Inserting %s: %s\n", key, value);
+		LinkedMap_str_int toAdd = LinkedMap__create;
+		BIGRAMHOLDER_SET(holder, key, toAdd);
 	}
 		
 	LinkedMap_str_int locationToAdd = BIGRAMHOLDER_FIND(holder, key);
@@ -39,12 +41,10 @@ void BiGramHolder__add(BiGramHolder holder, str key, str value) {
 	}
 	
 	LinkedMap__set(str, int, locationToAdd, value, valueToAdd, equals_str);
-	BIGRAMHOLDER_INSERT(holder, key, locationToAdd);
+	BIGRAMHOLDER_SET(holder, key, locationToAdd);
 	// printf("%s %s %d %d\n", key, value, LinkedMap__find(str, int, locationToAdd, value, equals_str), LinkedMap__find(str, int, BIGRAMHOLDER_FIND(holder, key), value, equals_str));
 	
-	printf("First\n");
-	BiGramHolder__display(holder);
-	
+	printf("First\n");	
 }
 
 int BiGramHolder__getTimes(BiGramHolder holder, str firstWord, str secondWord) {
@@ -60,9 +60,8 @@ BiGramHolder BiGramHolder__create(LinkedList_str words) {
 	LinkedList__foreach(str, word, words) {
 		if (prev != NULL) {
 			BiGramHolder__add(toReturn, prev, word);
-		}
-		BiGramHolder__display(toReturn);
-				
+			BiGramHolder__display(toReturn);
+		}				
 		prev = word;
 		continue;
 	}

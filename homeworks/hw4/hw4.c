@@ -124,9 +124,11 @@ int main(int argc, char** argv)
 	
 	BiGramHolder bigrams = BiGramHolder__create(words);
 	
+	BiGramHolder__display(bigrams);
+	
 	printf("%d\n", BiGramHolder__getTimes(bigrams, "are", "they"));
 	printf("%d\n", BiGramHolder__getTimes(bigrams, "are", "they'n"));
-	printf("%d\n", LinkedMap__containsKey(str, LinkedMap_str_int, (*bigrams), "are", equals));
+	printf("%d\n", LinkedMap__containsKey(str, LinkedMap_str_int, (*bigrams), "are", equals_str));
 	
 	
 	LinkedList__free(str, words);
