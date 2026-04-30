@@ -120,10 +120,6 @@ int main(int argc, char** argv)
 	
 	LinkedList_str words = readAllWords(inputFile);
 	
-	LinkedList__foreach(str, word, words) {
-		printf("String: %s\n", word);
-	}
-	
 	BiGramHolder bigrams = BiGramHolder__create(words);
 	
 	BiGramHolder__display(bigrams);

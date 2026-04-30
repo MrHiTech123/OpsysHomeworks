@@ -14,7 +14,7 @@
 #define LinkedList__createNodePtr(type, v) ({LINKEDLIST_NODETYPE_NAME(type)* MACRO_VAR(toReturn) = (LINKEDLIST_NODETYPE_NAME(type)*)calloc(1, sizeof(LINKEDLIST_NODETYPE_NAME(type))); MACRO_VAR(toReturn)->value = v; MACRO_VAR(toReturn);})
 #define LinkedList__append(type, list, v) {LINKEDLIST_NODETYPE_NAME(type)* MACRO_VAR(current) = list.first; while (MACRO_VAR(current) && MACRO_VAR(current)->next) {MACRO_VAR(current) = MACRO_VAR(current)->next;}; LINKEDLIST_NODETYPE_NAME(type)* MACRO_VAR(next) = LinkedList__createNodePtr(type, v); if (list.first) {MACRO_VAR(current)->next = MACRO_VAR(next);} else {list.first = MACRO_VAR(next);};}
 #define __LINKED_LIST_FREE(type, list, freeFunction) {LINKEDLIST_NODETYPE_NAME(type)* MACRO_VAR(current) = list.first; while (MACRO_VAR(current)) {LINKEDLIST_NODETYPE_NAME(type)* MACRO_VAR(next) = MACRO_VAR(current)->next; freeFunction(MACRO_VAR(current)); MACRO_VAR(current) = MACRO_VAR(next);}}
-#define LinkedList__length(type, list) ({int MACRO_VAR(toReturn) = 0; LinkedList__foreach(type, MACRO_VAR(unused), list) {++MACRO_VAR(toReturn);}; MACRO_VAR(toReturn);})
+#define LinkedList__length(type, list) ({int MACRO_VAR(toReturn) = 0; LinkedList__foreach(type, MACRO_VAR(unused), list) {MACRO_VAR(unused) = MACRO_VAR(unused); ++MACRO_VAR(toReturn);}; MACRO_VAR(toReturn);})
 
 #define LinkedList__free(type, list) __LINKED_LIST_FREE(type, list, free)
 #define LinkedList__freeFree(type, list) __LINKED_LIST_FREE(type, list, LinkedList__free)
