@@ -45,6 +45,8 @@ char readOneChar(int fd) {
 	return toReturn;
 }
 
+
+
 char* linkedList_char__toString(LinkedList_char list) {
 	str toReturn = calloc(LinkedList__length(char, list) + 1, sizeof(char));
 	int writingIndex = 0;

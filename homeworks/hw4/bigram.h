@@ -14,7 +14,6 @@ typedef LinkedMap_str_LinkedMap_str_int* BiGramHolder;
 #define BIGRAMHOLDER_FOREACH(varName, holder) LinkedList__foreach(LinkedMapDataStruct_str_LinkedMap_str_int, varName, (*holder))
 #define BIGRAMHOLDER_SET(holder, firstWord, value) LinkedMap__set(str, LinkedMap_str_int, (*holder), firstWord, value, equals_str);
 
-
 void BiGramHolder__display(BiGramHolder holder) {
 	printf("Displaying bigram holder!\n");
 	BIGRAMHOLDER_FOREACH(s, holder) {
@@ -51,6 +50,26 @@ int BiGramHolder__getTimes(BiGramHolder holder, str firstWord, str secondWord) {
 	}
 	
 	return LinkedMap__find(str, int, location, secondWord, equals_str);
+}
+
+str joinAll(LinkedList_str toJoin) {
+	int listLen = LinkedList__length(str, toJoin);
+	int stringLen = listLen;
+	LinkedList__foreach(str, word, toJoin) {
+		stringLen += strlen(word);
+	}
+	
+	str toReturn = calloc(stringLen, sizeof(char));
+	int currentIndex = 0;
+	
+	LinkedList__foreach(str, word2, toJoin) {
+		strcpy(toReturn + currentIndex, word2);
+		currentIndex += strlen(word2);
+		*(toReturn + currentIndex) = ' ';
+		++currentIndex;
+	}
+		
+	return toReturn;
 }
 
 LinkedList_str BiGramHolder__rankTopNextWords(BiGramHolder holder, str currentWord, int wordsToRank) {
