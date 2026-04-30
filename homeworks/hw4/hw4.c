@@ -129,7 +129,7 @@ void ensureBytesReadOverNetwork(int fd, int bytesToRead, void* buffer) {
 }
 
 void addDataToBigrams(char* data) {
-	printf("TODO: Add data %s to bigrams", data);
+	printf("TODO: Add data %s to bigrams\n", data);
 }
 
 int appLayerProtocolInit(unsigned short port) {

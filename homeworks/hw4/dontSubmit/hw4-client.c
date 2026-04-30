@@ -13,7 +13,7 @@
 
 #define MAXBUFFER 1024
 
-int main()
+int main(int argc, char** argv)
 {
   /* create TCP client socket (endpoint) */
   int sd = socket( AF_INET, SOCK_STREAM, 0 );
@@ -40,7 +40,7 @@ int main()
   struct sockaddr_in tcp_server;
   tcp_server.sin_family = AF_INET;  /* IPv4 */
   memcpy( (void *)&tcp_server.sin_addr, (void *)hp->h_addr, hp->h_length );
-  unsigned short server_port = 8123;
+  unsigned short server_port = argv[1];
   tcp_server.sin_port = htons( server_port );
 
   printf( "CLIENT: connecting to server...\n" );
