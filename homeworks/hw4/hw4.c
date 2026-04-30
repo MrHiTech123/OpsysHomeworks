@@ -188,7 +188,7 @@ void* appLayerProtocol(void* listenerPtr) {
 					ensureBytesReadOverNetwork(newsd, sizeof(int), &length);
 					
 					length = ntohl(length);
-					printf("Rcvd length %d\n", length);
+					printf("THREAD: rcvd '+' ADD request of length %d bytes\n", length);
 					char* readData = calloc(length + 1, sizeof(char));
 					
 					ensureBytesReadOverNetwork(newsd, length, readData);
