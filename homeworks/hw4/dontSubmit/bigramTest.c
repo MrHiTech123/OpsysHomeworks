@@ -37,26 +37,29 @@ int main(int argc, char const *argv[])
 		
 	}
 	
-	BiGramHolder__free(holder);
+	
 	
 	str sentence = joinAll(words);
 	
 	printf("%s\n", sentence);
 	
+	
+	
+	
+	LinkedList_LinkedList_str sentences = BiGramHolder__generateSentences(holder, "the", 6, 1);
+	
+	printf("%d\n", LinkedList__length(LinkedList_str, sentences));
+	
+	LinkedList__foreach(LinkedList_str, currentList, sentences) {
+		printf("%s\n", joinAll(currentList));
+	}
+	
+	
+	BiGramHolder__free(holder);
 	free(sentence);
 	
 	
 	LinkedList__free(str, words);
-	
-	
-	// LinkedList_LinkedList_str sentences = BiGramHolder__generateSentences(holder, "the", 6, 1);
-	
-	// printf("%d\n", LinkedList__length(LinkedList_str, sentences));
-	
-	// LinkedList__foreach(LinkedList_str, currentList, sentences) {
-	// 	printf("%s\n", joinAll(currentList));
-	// }
-	
 	
 	
 	return 0;
