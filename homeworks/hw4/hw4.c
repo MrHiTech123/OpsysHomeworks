@@ -466,6 +466,21 @@ void sendStringMessage(int newsd, str toSend) {
 	send(newsd, toSend, strlen(toSend), 0);
 }
 
+void* timerThread() {
+	int time = 0;
+	while (1) {
+		printf("Time = %d\n", time);
+		sleep(1);
+		++time;
+	}
+}
+
+pthread_t startTimerThread() {
+	pthread_t toReturn;
+	pthread_create(&toReturn, NULL, timerThread, NULL);
+	return toReturn;
+}
+
 void sendSentenceCollection(int newsd, LinkedList_LinkedList_str sentences) {
 	LinkedList__foreach (LinkedList_str, currentSentenceLinkedList, sentences) {
 		str sentence = joinAll(currentSentenceLinkedList);
@@ -503,10 +518,13 @@ void* appLayerProtocolThread(void* argsPtr) {
 				
 				length = ntohl(length);
 				printf("THREAD: rcvd '+' ADD request of length %d byte%s\n", length, pluralize(length));
+				
 				char* readData = calloc(length + 1, sizeof(char));
 				
 				ensureBytesReadOverNetwork(newsd, length, readData);
 				addDataToBigrams(readData, bigrams);
+				
+				fprintf(stderr, "Message recieved was %s\n", readData);
 				
 				sendOKResponse(newsd);
 				
@@ -565,6 +583,9 @@ void* appLayerProtocolThread(void* argsPtr) {
 }
 
 void appLayerProtocol(int listener, BiGramHolder bigrams) {
+	
+	pthread_t timerThreadId = startTimerThread();
+	
 	LinkedList_pthread_t threadIds = LinkedList__create;
 	
 	while (!shutDownFlag) {
@@ -597,6 +618,8 @@ void appLayerProtocol(int listener, BiGramHolder bigrams) {
 	LinkedList__foreach(pthread_t, threadId, threadIds) {
 		pthread_join(threadId, NULL);
 	}
+	
+	pthread_cancel(timerThreadId);
 	
 	printf("MAIN: shutting down after confirming 0 child threads running\n");
 	
