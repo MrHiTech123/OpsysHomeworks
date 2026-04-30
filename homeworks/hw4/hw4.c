@@ -115,10 +115,7 @@ LinkedList_str readAllWordsFromString(str content) {
 	int writingEnd = at(filePipe, 1);
 	free(filePipe);
 	
-	printf("Before write\n");
-	write(writingEnd, content, strlen(content) + 1);
-	printf("After writing\n");
-	
+	write(writingEnd, content, strlen(content) + 1);	
 	
 	LinkedList_str toReturn = readAllWordsFromFile(readingEnd);
 	
@@ -159,10 +156,8 @@ void addDataToBigrams(char* data, BiGramHolder bigrams) {
 	LinkedList_str words = readAllWordsFromString(data);
 	printf("THREAD: extracted %d bigrams\n", LinkedList__length(str, words));
 	
-	printf("Before lock\n");
 	pthread_mutex_lock(&BIGRAM_HOLDER_MUTEX);
-	printf("After lock\n");
-	BiGramHolder__addAll(bigrams, words);
+		BiGramHolder__addAll(bigrams, words);
 	pthread_mutex_unlock(&BIGRAM_HOLDER_MUTEX);
 	
 	LinkedList__free(str, words);
@@ -256,13 +251,11 @@ void* appLayerProtocolThread(void* argsPtr) {
 				break;
 			case INSTRUCTION_TYPE_CLOSE:
 				printf("THREAD: rcvd 'C' CLOSE request\n");
-				printf("%c char\n", instructionType);
 				sendOKResponse(newsd);
 				return NULL;
 				
 			case INSTRUCTION_TYPE_SHUTDOWN:
 				printf("THREAD: rcvd 'X' SHUTDOWN request\n");
-				printf("%c char\n", instructionType);
 				shutdown(listener, SHUT_RD);
 				shutDownFlag = true;
 				sendOKResponse(newsd);
