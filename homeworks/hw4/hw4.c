@@ -173,6 +173,8 @@ LinkedList_str BiGramHolder__rankTopNextWords(BiGramHolder holder, str currentWo
 
 
 LinkedList_LinkedList_str BiGramHolder__generateSentences(BiGramHolder holder, str rootWord, int breadth, int depth) {
+	--depth;
+	
 	LinkedList_LinkedList_str toReturn = LinkedList__create;
 	LinkedList_str rootList = LinkedList__create;
 	LinkedList__append(str, rootList, rootWord);
@@ -509,10 +511,11 @@ void* appLayerProtocolThread(void* argsPtr) {
 			case INSTRUCTION_TYPE_GENERATE:
 				short breadth, depth;
 				
-				ensureBytesReadOverNetwork(newsd, sizeof(short), &breadth);
-				breadth = ntohs(breadth);
 				ensureBytesReadOverNetwork(newsd, sizeof(short), &depth);
 				depth = ntohs(depth);
+				ensureBytesReadOverNetwork(newsd, sizeof(short), &breadth);
+				breadth = ntohs(breadth);
+				
 				
 				char* word = readWordFromFile(newsd, NULL);
 				
@@ -562,7 +565,7 @@ void appLayerProtocol(int listener, BiGramHolder bigrams) {
 		struct sockaddr_in remote_client;
 		int addrlen = sizeof( remote_client );
 
-		printf( "MAIN: Blocked on accept()\n" );
+		printf( "MAIN: blocked on accept()\n" );
 		int newsd = accept( listener, (struct sockaddr *)&remote_client, (socklen_t *)&addrlen );
 		
 		if (shutDownFlag) {
@@ -571,7 +574,7 @@ void appLayerProtocol(int listener, BiGramHolder bigrams) {
 		
 		if ( newsd == -1 ) { perror( "accept() failed" ); continue; }
 		
-		printf( "MAIN: Accepted new client connection on newsd %d\n", newsd );
+		printf( "MAIN: new connection established\n");
 		
 		pthread_t threadId;
 		
@@ -610,6 +613,9 @@ int main(int argc, char** argv)
 	
 	BiGramHolder bigrams = BiGramHolder__create(words);
 	
+	
+	int wordsLen = LinkedList__length(str, words);
+	printf("MAIN: extracted %d words (%d bigrams) from %s", wordsLen, wordsLen - 1, inputFileName);
 	
 	int listener = appLayerProtocolInit(port);
 	
