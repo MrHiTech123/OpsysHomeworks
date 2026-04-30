@@ -60,9 +60,7 @@ str joinAll(LinkedList_str toJoin) {
 	LinkedList__foreach(str, word, toJoin) {
 		stringLen += strlen(word);
 	}
-	
-	printf("%d\n", stringLen);
-	
+		
 	str toReturn = calloc(stringLen, sizeof(char));
 	int currentIndex = 0;
 	
