@@ -1,84 +1,261 @@
-In file included from hw4.c:10:
-bigram.h: In function ‘BiGramHolder__add’:
-linkedmap.h:29:218: error: invalid type argument of ‘->’ (have ‘LinkedMap_str_LinkedMap_str_int’ {aka ‘LinkedList_LinkedMapDataStruct_str_LinkedMap_str_int’})
-   29 | #define LinkedMap__set(keyType, valueType, map, k, v, equalityFunction) if (LinkedMap__containsKey(keyType, valueType, map, k, equalityFunction)) {for (LINKEDMAP_NODE_NAME(keyType, valueType)* MACRO_VAR(current) = map->first; MACRO_VAR(current); MACRO_VAR(current) = MACRO_VAR(current)->next) {if (equalityFunction(MACRO_VAR(current)->value->key, k)) {MACRO_VAR(current)->value->value = v; break;}}} else {LinkedMap__insert(keyType, valueType, map, k, v)}
-      |                                                                                                                                                                                                                          ^~
-bigram.h:15:52: note: in expansion of macro ‘LinkedMap__set’
-   15 | #define BIGRAMHOLDER_SET(holder, firstWord, value) LinkedMap__set(str, LinkedMap_str_int, (*holder), firstWord, value, equals_str);
-      |                                                    ^~~~~~~~~~~~~~
-bigram.h:32:17: note: in expansion of macro ‘BIGRAMHOLDER_SET’
-   32 |                 BIGRAMHOLDER_SET(holder, key, toAdd);
-      |                 ^~~~~~~~~~~~~~~~
-In file included from hw4.c:8:
-linkedmap.h:29:341: error: invalid type argument of ‘->’ (have ‘LinkedMapDataStruct_str_LinkedMap_str_int’)
-   29 | #define LinkedMap__set(keyType, valueType, map, k, v, equalityFunction) if (LinkedMap__containsKey(keyType, valueType, map, k, equalityFunction)) {for (LINKEDMAP_NODE_NAME(keyType, valueType)* MACRO_VAR(current) = map->first; MACRO_VAR(current); MACRO_VAR(current) = MACRO_VAR(current)->next) {if (equalityFunction(MACRO_VAR(current)->value->key, k)) {MACRO_VAR(current)->value->value = v; break;}}} else {LinkedMap__insert(keyType, valueType, map, k, v)}
-      |                                                                                                                                                                                                                                                                                                                                                     ^~
-mystring.h:8:36: note: in definition of macro ‘equals_str’
-    8 | #define equals_str(s1, s2) !strcmp(s1, s2)
-      |                                    ^~
-bigram.h:15:52: note: in expansion of macro ‘LinkedMap__set’
-   15 | #define BIGRAMHOLDER_SET(holder, firstWord, value) LinkedMap__set(str, LinkedMap_str_int, (*holder), firstWord, value, equals_str);
-      |                                                    ^~~~~~~~~~~~~~
-bigram.h:32:17: note: in expansion of macro ‘BIGRAMHOLDER_SET’
-   32 |                 BIGRAMHOLDER_SET(holder, key, toAdd);
-      |                 ^~~~~~~~~~~~~~~~
-linkedmap.h:29:378: error: invalid type argument of ‘->’ (have ‘LinkedMapDataStruct_str_LinkedMap_str_int’)
-   29 | #define LinkedMap__set(keyType, valueType, map, k, v, equalityFunction) if (LinkedMap__containsKey(keyType, valueType, map, k, equalityFunction)) {for (LINKEDMAP_NODE_NAME(keyType, valueType)* MACRO_VAR(current) = map->first; MACRO_VAR(current); MACRO_VAR(current) = MACRO_VAR(current)->next) {if (equalityFunction(MACRO_VAR(current)->value->key, k)) {MACRO_VAR(current)->value->value = v; break;}}} else {LinkedMap__insert(keyType, valueType, map, k, v)}
-      |                                                                                                                                                                                                                                                                                                                                                                                          ^~
-bigram.h:15:52: note: in expansion of macro ‘LinkedMap__set’
-   15 | #define BIGRAMHOLDER_SET(holder, firstWord, value) LinkedMap__set(str, LinkedMap_str_int, (*holder), firstWord, value, equals_str);
-      |                                                    ^~~~~~~~~~~~~~
-bigram.h:32:17: note: in expansion of macro ‘BIGRAMHOLDER_SET’
-   32 |                 BIGRAMHOLDER_SET(holder, key, toAdd);
-      |                 ^~~~~~~~~~~~~~~~
-linkedmap.h:29:218: error: invalid type argument of ‘->’ (have ‘LinkedMap_str_int’ {aka ‘LinkedList_LinkedMapDataStruct_str_int’})
-   29 | #define LinkedMap__set(keyType, valueType, map, k, v, equalityFunction) if (LinkedMap__containsKey(keyType, valueType, map, k, equalityFunction)) {for (LINKEDMAP_NODE_NAME(keyType, valueType)* MACRO_VAR(current) = map->first; MACRO_VAR(current); MACRO_VAR(current) = MACRO_VAR(current)->next) {if (equalityFunction(MACRO_VAR(current)->value->key, k)) {MACRO_VAR(current)->value->value = v; break;}}} else {LinkedMap__insert(keyType, valueType, map, k, v)}
-      |                                                                                                                                                                                                                          ^~
-bigram.h:43:9: note: in expansion of macro ‘LinkedMap__set’
-   43 |         LinkedMap__set(str, int, locationToAdd, value, valueToAdd, equals_str);
-      |         ^~~~~~~~~~~~~~
-linkedmap.h:29:341: error: invalid type argument of ‘->’ (have ‘LinkedMapDataStruct_str_int’)
-   29 | #define LinkedMap__set(keyType, valueType, map, k, v, equalityFunction) if (LinkedMap__containsKey(keyType, valueType, map, k, equalityFunction)) {for (LINKEDMAP_NODE_NAME(keyType, valueType)* MACRO_VAR(current) = map->first; MACRO_VAR(current); MACRO_VAR(current) = MACRO_VAR(current)->next) {if (equalityFunction(MACRO_VAR(current)->value->key, k)) {MACRO_VAR(current)->value->value = v; break;}}} else {LinkedMap__insert(keyType, valueType, map, k, v)}
-      |                                                                                                                                                                                                                                                                                                                                                     ^~
-mystring.h:8:36: note: in definition of macro ‘equals_str’
-    8 | #define equals_str(s1, s2) !strcmp(s1, s2)
-      |                                    ^~
-bigram.h:43:9: note: in expansion of macro ‘LinkedMap__set’
-   43 |         LinkedMap__set(str, int, locationToAdd, value, valueToAdd, equals_str);
-      |         ^~~~~~~~~~~~~~
-linkedmap.h:29:378: error: invalid type argument of ‘->’ (have ‘LinkedMapDataStruct_str_int’)
-   29 | #define LinkedMap__set(keyType, valueType, map, k, v, equalityFunction) if (LinkedMap__containsKey(keyType, valueType, map, k, equalityFunction)) {for (LINKEDMAP_NODE_NAME(keyType, valueType)* MACRO_VAR(current) = map->first; MACRO_VAR(current); MACRO_VAR(current) = MACRO_VAR(current)->next) {if (equalityFunction(MACRO_VAR(current)->value->key, k)) {MACRO_VAR(current)->value->value = v; break;}}} else {LinkedMap__insert(keyType, valueType, map, k, v)}
-      |                                                                                                                                                                                                                                                                                                                                                                                          ^~
-bigram.h:43:9: note: in expansion of macro ‘LinkedMap__set’
-   43 |         LinkedMap__set(str, int, locationToAdd, value, valueToAdd, equals_str);
-      |         ^~~~~~~~~~~~~~
-linkedmap.h:29:218: error: invalid type argument of ‘->’ (have ‘LinkedMap_str_LinkedMap_str_int’ {aka ‘LinkedList_LinkedMapDataStruct_str_LinkedMap_str_int’})
-   29 | #define LinkedMap__set(keyType, valueType, map, k, v, equalityFunction) if (LinkedMap__containsKey(keyType, valueType, map, k, equalityFunction)) {for (LINKEDMAP_NODE_NAME(keyType, valueType)* MACRO_VAR(current) = map->first; MACRO_VAR(current); MACRO_VAR(current) = MACRO_VAR(current)->next) {if (equalityFunction(MACRO_VAR(current)->value->key, k)) {MACRO_VAR(current)->value->value = v; break;}}} else {LinkedMap__insert(keyType, valueType, map, k, v)}
-      |                                                                                                                                                                                                                          ^~
-bigram.h:15:52: note: in expansion of macro ‘LinkedMap__set’
-   15 | #define BIGRAMHOLDER_SET(holder, firstWord, value) LinkedMap__set(str, LinkedMap_str_int, (*holder), firstWord, value, equals_str);
-      |                                                    ^~~~~~~~~~~~~~
-bigram.h:44:9: note: in expansion of macro ‘BIGRAMHOLDER_SET’
-   44 |         BIGRAMHOLDER_SET(holder, key, locationToAdd);
-      |         ^~~~~~~~~~~~~~~~
-linkedmap.h:29:341: error: invalid type argument of ‘->’ (have ‘LinkedMapDataStruct_str_LinkedMap_str_int’)
-   29 | #define LinkedMap__set(keyType, valueType, map, k, v, equalityFunction) if (LinkedMap__containsKey(keyType, valueType, map, k, equalityFunction)) {for (LINKEDMAP_NODE_NAME(keyType, valueType)* MACRO_VAR(current) = map->first; MACRO_VAR(current); MACRO_VAR(current) = MACRO_VAR(current)->next) {if (equalityFunction(MACRO_VAR(current)->value->key, k)) {MACRO_VAR(current)->value->value = v; break;}}} else {LinkedMap__insert(keyType, valueType, map, k, v)}
-      |                                                                                                                                                                                                                                                                                                                                                     ^~
-mystring.h:8:36: note: in definition of macro ‘equals_str’
-    8 | #define equals_str(s1, s2) !strcmp(s1, s2)
-      |                                    ^~
-bigram.h:15:52: note: in expansion of macro ‘LinkedMap__set’
-   15 | #define BIGRAMHOLDER_SET(holder, firstWord, value) LinkedMap__set(str, LinkedMap_str_int, (*holder), firstWord, value, equals_str);
-      |                                                    ^~~~~~~~~~~~~~
-bigram.h:44:9: note: in expansion of macro ‘BIGRAMHOLDER_SET’
-   44 |         BIGRAMHOLDER_SET(holder, key, locationToAdd);
-      |         ^~~~~~~~~~~~~~~~
-linkedmap.h:29:378: error: invalid type argument of ‘->’ (have ‘LinkedMapDataStruct_str_LinkedMap_str_int’)
-   29 | #define LinkedMap__set(keyType, valueType, map, k, v, equalityFunction) if (LinkedMap__containsKey(keyType, valueType, map, k, equalityFunction)) {for (LINKEDMAP_NODE_NAME(keyType, valueType)* MACRO_VAR(current) = map->first; MACRO_VAR(current); MACRO_VAR(current) = MACRO_VAR(current)->next) {if (equalityFunction(MACRO_VAR(current)->value->key, k)) {MACRO_VAR(current)->value->value = v; break;}}} else {LinkedMap__insert(keyType, valueType, map, k, v)}
-      |                                                                                                                                                                                                                                                                                                                                                                                          ^~
-bigram.h:15:52: note: in expansion of macro ‘LinkedMap__set’
-   15 | #define BIGRAMHOLDER_SET(holder, firstWord, value) LinkedMap__set(str, LinkedMap_str_int, (*holder), firstWord, value, equals_str);
-      |                                                    ^~~~~~~~~~~~~~
-bigram.h:44:9: note: in expansion of macro ‘BIGRAMHOLDER_SET’
-   44 |         BIGRAMHOLDER_SET(holder, key, locationToAdd);
-      |         ^~~~~~~~~~~~~~~~
+String: move'n
+String: t
+String: row
+String: size
+String: these
+String: are
+String: my
+String: awesome
+String: words
+String: aren't
+String: they
+String: are
+String: they'n
+String: t
+Inserting move'n: t
+First
+Displaying bigram holder!
+move'n
+	t 1
+Inserting t: row
+First
+Displaying bigram holder!
+move'n
+	t 1
+t
+	row 1
+Inserting row: size
+First
+Displaying bigram holder!
+move'n
+	t 1
+t
+	row 1
+row
+	size 1
+Inserting size: these
+First
+Displaying bigram holder!
+move'n
+	t 1
+t
+	row 1
+row
+	size 1
+size
+	these 1
+Inserting these: are
+First
+Displaying bigram holder!
+move'n
+	t 1
+t
+	row 1
+row
+	size 1
+size
+	these 1
+these
+	are 1
+Inserting are: my
+First
+Displaying bigram holder!
+move'n
+	t 1
+t
+	row 1
+row
+	size 1
+size
+	these 1
+these
+	are 1
+are
+	my 1
+Inserting my: awesome
+First
+Displaying bigram holder!
+move'n
+	t 1
+t
+	row 1
+row
+	size 1
+size
+	these 1
+these
+	are 1
+are
+	my 1
+my
+	awesome 1
+Inserting awesome: words
+First
+Displaying bigram holder!
+move'n
+	t 1
+t
+	row 1
+row
+	size 1
+size
+	these 1
+these
+	are 1
+are
+	my 1
+my
+	awesome 1
+awesome
+	words 1
+Inserting words: aren't
+First
+Displaying bigram holder!
+move'n
+	t 1
+t
+	row 1
+row
+	size 1
+size
+	these 1
+these
+	are 1
+are
+	my 1
+my
+	awesome 1
+awesome
+	words 1
+words
+	aren't 1
+Inserting aren't: they
+First
+Displaying bigram holder!
+move'n
+	t 1
+t
+	row 1
+row
+	size 1
+size
+	these 1
+these
+	are 1
+are
+	my 1
+my
+	awesome 1
+awesome
+	words 1
+words
+	aren't 1
+aren't
+	they 1
+Inserting they: are
+First
+Displaying bigram holder!
+move'n
+	t 1
+t
+	row 1
+row
+	size 1
+size
+	these 1
+these
+	are 1
+are
+	my 1
+my
+	awesome 1
+awesome
+	words 1
+words
+	aren't 1
+aren't
+	they 1
+they
+	are 1
+First
+Displaying bigram holder!
+move'n
+	t 1
+t
+	row 1
+row
+	size 1
+size
+	these 1
+these
+	are 1
+are
+	my 1
+	they'n 1
+my
+	awesome 1
+awesome
+	words 1
+words
+	aren't 1
+aren't
+	they 1
+they
+	are 1
+Inserting they'n: t
+First
+Displaying bigram holder!
+move'n
+	t 1
+t
+	row 1
+row
+	size 1
+size
+	these 1
+these
+	are 1
+are
+	my 1
+	they'n 1
+my
+	awesome 1
+awesome
+	words 1
+words
+	aren't 1
+aren't
+	they 1
+they
+	are 1
+they'n
+	t 1
+Displaying bigram holder!
+move'n
+	t 1
+t
+	row 1
+row
+	size 1
+size
+	these 1
+these
+	are 1
+are
+	my 1
+	they'n 1
+my
+	awesome 1
+awesome
+	words 1
+words
+	aren't 1
+aren't
+	they 1
+they
+	are 1
+they'n
+	t 1
+0
+1
+1
