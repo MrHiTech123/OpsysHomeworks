@@ -68,7 +68,9 @@ void BiGramHolder__addAll(BiGramHolder holder, LinkedList_str words) {
 BiGramHolder BiGramHolder__create(LinkedList_str words) {
 	BiGramHolder toReturn = calloc(1, sizeof(LinkedMap_str_LinkedMap_str_int));
 	toReturn->first = NULL;
+	printf("Addall before\n");
 	BiGramHolder__addAll(toReturn, words);
+	printf("Addall after\n");
 	return toReturn;
 }
 

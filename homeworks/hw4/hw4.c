@@ -115,7 +115,10 @@ LinkedList_str readAllWordsFromString(str content) {
 	int writingEnd = at(filePipe, 1);
 	free(filePipe);
 	
-	write(writingEnd, content, strlen(content));
+	printf("Before write\n");
+	write(writingEnd, content, strlen(content) + 1);
+	printf("After writing\n");
+	
 	
 	LinkedList_str toReturn = readAllWordsFromFile(readingEnd);
 	
@@ -156,7 +159,9 @@ void addDataToBigrams(char* data, BiGramHolder bigrams) {
 	LinkedList_str words = readAllWordsFromString(data);
 	printf("THREAD: extracted %d bigrams\n", LinkedList__length(str, words));
 	
+	printf("Before lock\n");
 	pthread_mutex_lock(&BIGRAM_HOLDER_MUTEX);
+	printf("After lock\n");
 	BiGramHolder__addAll(bigrams, words);
 	pthread_mutex_unlock(&BIGRAM_HOLDER_MUTEX);
 	
