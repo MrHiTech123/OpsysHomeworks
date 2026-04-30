@@ -8,8 +8,11 @@
 #include "mystring.h"
 #include "linkedlist.h"
 #include "linkedmap.h"
+#include "bigram.h"
 DECLARE_LINKEDLIST_TYPE(char);
-// DECLARE_LINKEDLIST_TYPE(str);
+
+
+
 
 #define at(arr, i) *(arr + i)
 #define APOSTROPHE '\''
@@ -25,12 +28,14 @@ void settings() {
     setvbuf(stdout, NULL, _IONBF, 0);
 }
 
+
 char readOneChar(int fd) {
 	char toReturn;
 	int charactersRead = read(fd, &toReturn, 1);
 	if (charactersRead == 0) {
 		return '\0';
 	}
+	toReturn = tolower(toReturn);
 	return toReturn;
 }
 
@@ -118,7 +123,11 @@ int main(int argc, char** argv)
 		printf("String: %s\n", word);
 	}
 	
+	BiGramHolder bigrams = BiGramHolder__create(words);
 	
+	printf("%d\n", BiGramHolder__getTimes(bigrams, "are", "they"));
+	printf("%d\n", BiGramHolder__getTimes(bigrams, "are", "they'n"));
+	printf("%d\n", LinkedMap__containsKey(str, LinkedMap_str_int, bigrams, "are", equals));
 	
 	
 	LinkedList__free(str, words);
