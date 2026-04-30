@@ -119,9 +119,54 @@ void freeAllStrings() {
 #define INSTRUCTION_TYPE_CLOSE 'C'
 #define INSTRUCTION_TYPE_SHUTDOWN 'X'
 
+void ensureBytesReadOverNetwork(int fd, int bytesToRead, void* buffer) {
+	int totalBytesRead = 0;
+	int n;
+	while (totalBytesRead < bytesToRead) {
+		n = recv(fd, buffer + totalBytesRead, bytesToRead - totalBytesRead, 0);
+		totalBytesRead += n;
+	}
+}
 
-void* appLayerProtocol(int listener) {
+void addDataToBigrams(char* data) {
+	printf("TODO: Add data %s to bigrams", data);
+}
+
+int appLayerProtocolInit(unsigned short port) {
+	int listener = socket( AF_INET, SOCK_STREAM, 0 );
+    /* here, the listener is a socket descriptor (part of the fd table) */
+
+	if ( listener == -1 ) { perror( "socket() failed" ); return EXIT_FAILURE; }
+
+	/* populate the socket structure for bind() */
+	struct sockaddr_in tcp_server;
+	tcp_server.sin_family = AF_INET;  /* IPv4 */
+
+	tcp_server.sin_addr.s_addr = htonl( INADDR_ANY );
+	/* allow any IP address to connect */
+
+	tcp_server.sin_port = htons( port );
+	
+	if ( bind( listener, (struct sockaddr *)&tcp_server, sizeof( tcp_server ) ) == -1 )
+	{
+		perror( "bind() failed" );
+		return EXIT_FAILURE;
+	}
+
+	/* identify our port number (socket) as a TCP listener */
+	if ( listen( listener, 5 ) == -1 )
+	{
+		perror( "listen() failed" );
+		return EXIT_FAILURE;
+	}
+	
+	return listener;
+}
+
+void* appLayerProtocol(void* listenerPtr) {
+	int listener = *(int*)listenerPtr;
 	while (1) {
+		printf("Start\n");
 		struct sockaddr_in remote_client;
 		int addrlen = sizeof( remote_client );
 
@@ -140,11 +185,29 @@ void* appLayerProtocol(int listener) {
 			switch (instructionType) {
 				case INSTRUCTION_TYPE_ADD:
 					int length;
-					recv(newsd, &length, sizeof(int), 0);
+					ensureBytesReadOverNetwork(newsd, sizeof(int), &length);
+					
 					length = ntohl(length);
-					char* readData = calloc(length, sizeof(char));
+					printf("Rcvd length %d\n", length);
+					char* readData = calloc(length + 1, sizeof(char));
+					
+					ensureBytesReadOverNetwork(newsd, length, readData);
+					addDataToBigrams(readData);
+					
+					send(newsd, "OK\n\n", 4, 0);
 					
 					free(readData);
+					break;
+				case INSTRUCTION_TYPE_GENERATE:
+					short breadth, depth;
+					
+					
+					
+					str toSend = "Phrases delineated by \n chars\n\n";
+					
+					send(newsd, toSend, strlen(toSend), 0);
+					
+					printf("Generate\n");
 					
 			}
 			
@@ -162,6 +225,7 @@ int main(int argc, char** argv)
 {
 	settings();
 	str inputFileName = at(argv, 1);
+	unsigned short port = (unsigned short)atoi(at(argv, 2));
 	int inputFile = open(inputFileName, O_RDONLY);
 	
 	LinkedList_str words = readAllWordsFromFile(inputFile);
@@ -169,22 +233,11 @@ int main(int argc, char** argv)
 	BiGramHolder bigrams = BiGramHolder__create(words);
 	
 	
-	int listener = socket( AF_INET, SOCK_STREAM, 0 );
-    /* here, the listener is a socket descriptor (part of the fd table) */
-
-	if ( listener == -1 ) { perror( "socket() failed" ); return EXIT_FAILURE; }
-
-	/* populate the socket structure for bind() */
-	struct sockaddr_in tcp_server;
-	tcp_server.sin_family = AF_INET;  /* IPv4 */
-
-	tcp_server.sin_addr.s_addr = htonl( INADDR_ANY );
-	/* allow any IP address to connect */
-
-	unsigned short port = 8123;   /* TO DO: have this given as a command-line arg */
-
-	tcp_server.sin_port = htons( port );
+	int listener = appLayerProtocolInit(port);
+	printf("%d\n", listener);
 	
+	// return 0;
+	appLayerProtocol(&listener);
 	
 	
 	
