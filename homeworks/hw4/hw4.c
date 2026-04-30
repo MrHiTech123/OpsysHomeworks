@@ -156,7 +156,7 @@ void ensureBytesReadOverNetwork(int fd, int bytesToRead, void* buffer) {
 
 void addDataToBigrams(char* data, BiGramHolder bigrams) {
 	LinkedList_str words = readAllWordsFromString(data);
-	printf("THREAD: extracted %d bigrams\n", LinkedList__length(str, words));
+	printf("THREAD: extracted %d bigrams\n", LinkedList__length(str, words) - 1);
 	
 	pthread_mutex_lock(&BIGRAM_HOLDER_MUTEX);
 		BiGramHolder__addAll(bigrams, words);
@@ -259,8 +259,10 @@ void* appLayerProtocolThread(void* argsPtr) {
 				
 				printf("THREAD: rcvd 'G' GENERATE request with depth %d and breadth %d\n", breadth, depth);
 				
-				LinkedList_LinkedList_str sentences = BiGramHolder__generateSentences(bigrams, word, breadth, depth);
-				
+				pthread_mutex_lock(&BIGRAM_HOLDER_MUTEX);
+					LinkedList_LinkedList_str sentences = 
+						BiGramHolder__generateSentences(bigrams, word, breadth, depth);
+				pthread_mutex_unlock(&BIGRAM_HOLDER_MUTEX);
 				
 				sendSentenceCollection(newsd, sentences);
 				
