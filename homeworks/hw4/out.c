@@ -3924,7 +3924,7 @@ char* linkedList_char__toString(LinkedList_char list) {
 }
 
 
-char* readWord(int fd, 
+char* readWordFromFile(int fd, 
 # 57 "hw4.c" 3 4
                       _Bool
 # 57 "hw4.c"
@@ -3978,7 +3978,7 @@ char* readWord(int fd,
 
 }
 
-LinkedList_str readAllWords(int fd) {
+LinkedList_str readAllWordsFromFile(int fd) {
  LinkedList_str toReturn = {.first = 
 # 92 "hw4.c" 3 4
                           ((void *)0)
@@ -3995,7 +3995,7 @@ _Bool
 # 94 "hw4.c"
                              ;
  while (!reachedEndOfFile) {
-  str currentWord = readWord(fd, &reachedEndOfFile);
+  str currentWord = readWordFromFile(fd, &reachedEndOfFile);
   if (strlen(currentWord)) {
    {LinkedListNode_str* macroVar_current__LINE__ = toReturn.first; while (macroVar_current__LINE__ && macroVar_current__LINE__->next) {macroVar_current__LINE__ = macroVar_current__LINE__->next;}; LinkedListNode_str* macroVar_next__LINE__ = ({LinkedListNode_str* macroVar_toReturn__LINE__ = (LinkedListNode_str*)calloc(1, sizeof(LinkedListNode_str)); macroVar_toReturn__LINE__->value = currentWord; macroVar_toReturn__LINE__;}); if (toReturn.first) {macroVar_current__LINE__->next = macroVar_next__LINE__;} else {toReturn.first = macroVar_next__LINE__;};};
   }
@@ -4022,7 +4022,7 @@ int main(int argc, char** argv)
 # 117 "hw4.c"
                                             );
 
- LinkedList_str words = readAllWords(inputFile);
+ LinkedList_str words = readAllWordsFromFile(inputFile);
 
  str word; if (words.first) {word = words.first->value;}; for (LinkedListNode_str* macroVar_currentList__LINE__ = words.first; macroVar_currentList__LINE__; ({macroVar_currentList__LINE__ = macroVar_currentList__LINE__->next; if (macroVar_currentList__LINE__) {word = macroVar_currentList__LINE__->value;}})) {
   printf("String: %s\n", word);

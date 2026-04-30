@@ -3,6 +3,10 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <arpa/inet.h>
+
 
 
 #include "mystring.h"
@@ -54,7 +58,7 @@ char* linkedList_char__toString(LinkedList_char list) {
 }
 
 
-char* readWord(int fd, bool* endOfFileFlag) {
+char* readWordFromFile(int fd, bool* endOfFileFlag) {
 	LinkedList_char wordSoFar = LinkedList__create;
 	
 	int apostrophesRead = 0;
@@ -88,12 +92,12 @@ char* readWord(int fd, bool* endOfFileFlag) {
 	
 }
 
-LinkedList_str readAllWords(int fd) {
+LinkedList_str readAllWordsFromFile(int fd) {
 	LinkedList_str toReturn = LinkedList__create;
 	
 	bool reachedEndOfFile = false;
 	while (!reachedEndOfFile) {
-		str currentWord = readWord(fd, &reachedEndOfFile);
+		str currentWord = readWordFromFile(fd, &reachedEndOfFile);
 		if (strlen(currentWord)) {
 			LinkedList__append(str, toReturn, currentWord);
 		}
@@ -110,6 +114,48 @@ void freeAllStrings() {
 }
 
 
+#define INSTRUCTION_TYPE_ADD '+'
+#define INSTRUCTION_TYPE_GENERATE 'G'
+#define INSTRUCTION_TYPE_CLOSE 'C'
+#define INSTRUCTION_TYPE_SHUTDOWN 'X'
+
+
+void* appLayerProtocol(int listener) {
+	while (1) {
+		struct sockaddr_in remote_client;
+		int addrlen = sizeof( remote_client );
+
+		printf( "SERVER: Blocked on accept()\n" );
+		int newsd = accept( listener, (struct sockaddr *)&remote_client, (socklen_t *)&addrlen );
+		if ( newsd == -1 ) { perror( "accept() failed" ); continue; }
+		
+		printf( "SERVER: Accepted new client connection on newsd %d\n", newsd );
+		/* newsd is a newly assigned socket (file) descriptor that is tied to
+		 *  the new incoming TCP connection that has been established
+		 */
+		int n = 1;
+		while (n > 0) {
+			char instructionType;
+			n = recv(newsd, &instructionType, sizeof(char), 0);
+			switch (instructionType) {
+				case INSTRUCTION_TYPE_ADD:
+					int length;
+					recv(newsd, &length, sizeof(int), 0);
+					length = ntohl(length);
+					char* readData = calloc(length, sizeof(char));
+					
+					free(readData);
+					
+			}
+			
+		}
+	}
+	
+}
+
+
+
+
 
 
 int main(int argc, char** argv)
@@ -118,9 +164,28 @@ int main(int argc, char** argv)
 	str inputFileName = at(argv, 1);
 	int inputFile = open(inputFileName, O_RDONLY);
 	
-	LinkedList_str words = readAllWords(inputFile);
+	LinkedList_str words = readAllWordsFromFile(inputFile);
 	
 	BiGramHolder bigrams = BiGramHolder__create(words);
+	
+	
+	int listener = socket( AF_INET, SOCK_STREAM, 0 );
+    /* here, the listener is a socket descriptor (part of the fd table) */
+
+	if ( listener == -1 ) { perror( "socket() failed" ); return EXIT_FAILURE; }
+
+	/* populate the socket structure for bind() */
+	struct sockaddr_in tcp_server;
+	tcp_server.sin_family = AF_INET;  /* IPv4 */
+
+	tcp_server.sin_addr.s_addr = htonl( INADDR_ANY );
+	/* allow any IP address to connect */
+
+	unsigned short port = 8123;   /* TO DO: have this given as a command-line arg */
+
+	tcp_server.sin_port = htons( port );
+	
+	
 	
 	
 	
