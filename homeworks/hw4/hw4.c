@@ -108,6 +108,24 @@ LinkedList_str readAllWordsFromFile(int fd) {
 	return toReturn;
 }
 
+LinkedList_str readAllWordsFromString(str content) {
+	int* filePipe = calloc(2, sizeof(int));
+	pipe(filePipe);
+	int readingEnd = at(filePipe, 0);
+	int writingEnd = at(filePipe, 1);
+	free(filePipe);
+	
+	write(writingEnd, content, strlen(content));
+	
+	LinkedList_str toReturn = readAllWordsFromFile(readingEnd);
+	
+	
+	close(readingEnd);
+	close(writingEnd);
+	
+	return toReturn;
+}
+
 void freeAllStrings() {
 	LinkedList__foreach(str, toDelete, allStringsMarkedForFreeing) {
 		free(toDelete);
