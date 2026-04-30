@@ -47,7 +47,7 @@ char readOneChar(int fd) {
 
 
 
-char* linkedList_char__toString(LinkedList_char list) {
+char* LinkedList_char__toString(LinkedList_char list) {
 	str toReturn = calloc(LinkedList__length(char, list) + 1, sizeof(char));
 	int writingIndex = 0;
 	
@@ -88,7 +88,7 @@ char* readWordFromFile(int fd, bool* endOfFileFlag) {
 		
 	}
 	
-	str toReturn = linkedList_char__toString(wordSoFar);
+	str toReturn = LinkedList_char__toString(wordSoFar);
 	
 	LinkedList__free(char, wordSoFar);
 	
@@ -200,6 +200,17 @@ void sendStringMessage(int newsd, str toSend) {
 	send(newsd, toSend, strlen(toSend), 0);
 }
 
+void sendSentenceCollection(int newsd, LinkedList_LinkedList_str sentences) {
+	LinkedList__foreach (LinkedList_str, currentSentenceLinkedList, sentences) {
+		str sentence = joinAll(currentSentenceLinkedList);
+		sendStringMessage(newsd, sentence);
+		sendStringMessage(newsd, "\n");
+		free(sentence);
+	}
+	
+	sendStringMessage(newsd, "\n");
+}
+
 void sendOKResponse(int newsd) {
 	sendStringMessage(newsd, "OK\n\n");
 	printf("THREAD: sent OK response\n");
@@ -243,13 +254,26 @@ void* appLayerProtocolThread(void* argsPtr) {
 				ensureBytesReadOverNetwork(newsd, sizeof(short), &depth);
 				depth = ntohs(depth);
 				
+				char* word = readWordFromFile(newsd, NULL);
+				
+				
 				printf("THREAD: rcvd 'G' GENERATE request with depth %d and breadth %d\n", breadth, depth);
 				
-				str toSend = "Phrases delineated by \n chars\n\n";
-				sendStringMessage(newsd, toSend);
+				LinkedList_LinkedList_str sentences = BiGramHolder__generateSentences(bigrams, word, breadth, depth);
 				
 				
-				printf("THREAD: Sent response with %d phrases.\n", 0);
+				sendSentenceCollection(newsd, sentences);
+				
+				printf("THREAD: Sent response with %d phrases.\n", LinkedList__length(LinkedList_str, sentences));
+				
+				LinkedList__foreach(LinkedList_str, toBeFreed, sentences) {
+					LinkedList__free(str, toBeFreed);
+				}
+				
+				LinkedList__free(LinkedList_str, sentences);
+				
+				
+				
 				break;
 			case INSTRUCTION_TYPE_CLOSE:
 				printf("THREAD: rcvd 'C' CLOSE request\n");

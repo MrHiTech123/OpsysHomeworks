@@ -156,6 +156,14 @@ LinkedList_LinkedList_str BiGramHolder__generateSentences(BiGramHolder holder, s
 	
 }
 
+void printSentenceCollection(LinkedList_LinkedList_str sentences) {
+	LinkedList__foreach (LinkedList_str, currentSentenceLinkedList, sentences) {
+		str sentence = joinAll(currentSentenceLinkedList);
+		printf("%s\n", sentence);
+		free(sentence);
+	}
+}
+
 
 void BiGramHolder__addAll(BiGramHolder holder, LinkedList_str words) {
 	str prev = NULL;

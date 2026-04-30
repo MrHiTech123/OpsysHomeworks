@@ -3909,7 +3909,7 @@ char readOneChar(int fd) {
  return toReturn;
 }
 
-char* linkedList_char__toString(LinkedList_char list) {
+char* LinkedList_char__toString(LinkedList_char list) {
  str toReturn = calloc(({int macroVar_toReturn__LINE__ = 0; char macroVar_unused__LINE__; if (list.first) {macroVar_unused__LINE__ = list.first->value;}; for (LinkedListNode_char* macroVar_currentList__LINE__ = list.first; macroVar_currentList__LINE__; ({macroVar_currentList__LINE__ = macroVar_currentList__LINE__->next; if (macroVar_currentList__LINE__) {macroVar_unused__LINE__ = macroVar_currentList__LINE__->value;}})) {++macroVar_toReturn__LINE__;}; macroVar_toReturn__LINE__;}) + 1, sizeof(char));
  int writingIndex = 0;
 
@@ -3970,7 +3970,7 @@ char* readWordFromFile(int fd,
 
  }
 
- str toReturn = linkedList_char__toString(wordSoFar);
+ str toReturn = LinkedList_char__toString(wordSoFar);
 
  {LinkedListNode_char* macroVar_current__LINE__ = wordSoFar.first; while (macroVar_current__LINE__) {LinkedListNode_char* macroVar_next__LINE__ = macroVar_current__LINE__->next; free(macroVar_current__LINE__); macroVar_current__LINE__ = macroVar_next__LINE__;}};
 
