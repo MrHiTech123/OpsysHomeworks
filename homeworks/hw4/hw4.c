@@ -523,7 +523,7 @@ void* appLayerProtocolThread(void* argsPtr) {
 				ensureBytesReadOverNetwork(newsd, length, readData);
 				addDataToBigrams(readData, bigrams);
 				
-				fprintf(stderr, "Message recieved was %s\n", readData);
+				// fprintf(stderr, "Message recieved was %s\n", readData);
 				
 				sendOKResponse(newsd);
 				
@@ -583,7 +583,9 @@ void* appLayerProtocolThread(void* argsPtr) {
 
 void appLayerProtocol(int listener, BiGramHolder bigrams) {
 	
-	pthread_t timerThreadId = startTimerThread();
+	#ifdef _TIMER
+		pthread_t timerThreadId = startTimerThread();
+	#endif
 	
 	LinkedList_pthread_t threadIds = LinkedList__create;
 	
@@ -618,7 +620,9 @@ void appLayerProtocol(int listener, BiGramHolder bigrams) {
 		pthread_join(threadId, NULL);
 	}
 	
-	pthread_join(timerThreadId, NULL);
+	#ifdef _TIMER
+		pthread_join(timerThreadId, NULL);
+	#endif
 	
 	printf("MAIN: shutting down after confirming 0 child threads running\n");
 	
