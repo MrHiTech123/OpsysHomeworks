@@ -6,6 +6,7 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <arpa/inet.h>
+#include <pthread.h>
 
 
 
@@ -13,6 +14,7 @@
 #include "linkedlist.h"
 #include "linkedmap.h"
 #include "bigram.h"
+DECLARE_LINKEDLIST_TYPE(pthread_t);
 DECLARE_LINKEDLIST_TYPE(char);
 
 
@@ -174,8 +176,14 @@ void sendOKResponse(int newsd) {
 	printf("THREAD: sent OK response\n");
 }
 
-void* appLayerProtocolThread(void* newsdPtr) {
-	int newsd = *(int*)newsdPtr;
+typedef struct {int listener; int newsd;} appLayerProtocolThreadArgs;
+
+
+void* appLayerProtocolThread(void* argsPtr) {
+	appLayerProtocolThreadArgs* args = (appLayerProtocolThreadArgs*)argsPtr;
+	int listener = args->listener;
+	int newsd = args->newsd;
+	free(argsPtr);
 	int n = 1;
 	while (n > 0) {
 		char instructionType;
@@ -221,6 +229,7 @@ void* appLayerProtocolThread(void* newsdPtr) {
 			case INSTRUCTION_TYPE_SHUTDOWN:
 				printf("THREAD: rcvd 'X' SHUTDOWN request\n");
 				printf("%c char\n", instructionType);
+				shutdown(listener, SHUT_RD);
 				shutDownFlag = true;
 				sendOKResponse(newsd);
 				return NULL;
@@ -232,6 +241,8 @@ void* appLayerProtocolThread(void* newsdPtr) {
 }
 
 void appLayerProtocol(int listener) {
+	LinkedList_pthread_t threadIds = LinkedList__create;
+	
 	while (!shutDownFlag) {
 		struct sockaddr_in remote_client;
 		int addrlen = sizeof( remote_client );
@@ -241,12 +252,25 @@ void appLayerProtocol(int listener) {
 		if ( newsd == -1 ) { perror( "accept() failed" ); continue; }
 		
 		printf( "MAIN: Accepted new client connection on newsd %d\n", newsd );
-		/* newsd is a newly assigned socket (file) descriptor that is tied to
-		 *  the new incoming TCP connection that has been established
-		 */
-		appLayerProtocolThread(&newsd);
+		
+		pthread_t threadId;
+		
+		appLayerProtocolThreadArgs* threadArgs = calloc(1, sizeof(appLayerProtocolThreadArgs));
+		threadArgs->listener = listener;
+		threadArgs->newsd = newsd;
+		
+		pthread_create(&threadId, NULL, appLayerProtocolThread, threadArgs);
+		
+		LinkedList__append(pthread_t, threadIds, threadId);
+		
+		// appLayerProtocolThread(&newsd);
 	}
 	
+	LinkedList__foreach(pthread_t, threadId, threadIds) {
+		pthread_join(threadId, NULL);
+	}
+	
+	LinkedList__free(pthread_t, threadIds);
 }
 
 
