@@ -268,7 +268,12 @@ void appLayerProtocol(int listener) {
 
 		printf( "MAIN: Blocked on accept()\n" );
 		int newsd = accept( listener, (struct sockaddr *)&remote_client, (socklen_t *)&addrlen );
-		if ( newsd == -1 && !shutDownFlag ) { perror( "accept() failed" ); continue; }
+		
+		if (shutDownFlag) {
+			break;
+		}
+		
+		if ( newsd == -1 ) { perror( "accept() failed" ); continue; }
 		
 		printf( "MAIN: Accepted new client connection on newsd %d\n", newsd );
 		

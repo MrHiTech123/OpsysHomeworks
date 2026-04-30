@@ -53,20 +53,26 @@ int BiGramHolder__getTimes(BiGramHolder holder, str firstWord, str secondWord) {
 	return LinkedMap__find(str, int, location, secondWord, equals_str);
 }
 
-BiGramHolder BiGramHolder__create(LinkedList_str words) {
-	BiGramHolder toReturn = calloc(1, sizeof(LinkedMap_str_LinkedMap_str_int));
-	toReturn->first = NULL;
+
+void BiGramHolder__addAll(BiGramHolder holder, LinkedList_str words) {
 	str prev = NULL;
 	LinkedList__foreach(str, word, words) {
 		if (prev != NULL) {
-			BiGramHolder__add(toReturn, prev, word);
-		}				
+			BiGramHolder__add(holder, prev, word);
+		}
 		prev = word;
 		continue;
 	}
-	
+}
+
+BiGramHolder BiGramHolder__create(LinkedList_str words) {
+	BiGramHolder toReturn = calloc(1, sizeof(LinkedMap_str_LinkedMap_str_int));
+	toReturn->first = NULL;
+	BiGramHolder__addAll(toReturn, words);
 	return toReturn;
 }
+
+
 
 // LinkedList_str BiGramHolder__(Get)
 
