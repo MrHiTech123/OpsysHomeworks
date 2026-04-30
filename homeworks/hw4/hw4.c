@@ -327,9 +327,7 @@ int main(int argc, char** argv)
 	
 	// return 0;
 	appLayerProtocol(listener, bigrams);
-	
-	BiGramHolder__display(bigrams);
-	
+		
 	
 	LinkedList__free(str, words);
 	BiGramHolder__free(bigrams);

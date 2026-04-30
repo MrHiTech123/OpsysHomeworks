@@ -53,6 +53,30 @@ int BiGramHolder__getTimes(BiGramHolder holder, str firstWord, str secondWord) {
 	return LinkedMap__find(str, int, location, secondWord, equals_str);
 }
 
+LinkedList_str BiGramHolder__rankTopNextWords(BiGramHolder holder, str currentWord, int wordsToRank) {
+	LinkedMap_str_int location = BIGRAMHOLDER_FIND(holder, currentWord);
+	
+	
+	LinkedList_str toReturn = LinkedList__create;
+	for (int i = 0; i < wordsToRank; ++i) {
+		str toAdd = NULL;
+		int mostAmounts = 0;
+		
+		LinkedList__foreach(LinkedMapDataStruct_str_int, wordAndFrequency, location) {
+			if (wordAndFrequency.value > mostAmounts && !LinkedList__contains(str, toReturn, wordAndFrequency.key, equals_str)) {
+				toAdd = wordAndFrequency.key;
+				mostAmounts = wordAndFrequency.value;
+			}
+		}
+		
+		LinkedList__append(str, toReturn, toAdd);
+	}
+	
+	return toReturn;
+	
+	
+}
+
 
 void BiGramHolder__addAll(BiGramHolder holder, LinkedList_str words) {
 	str prev = NULL;
