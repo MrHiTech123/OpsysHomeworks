@@ -621,6 +621,11 @@ void* appLayerProtocolThread(void* argsPtr) {
 				
 				char* word = readWordFromFile(newsd, NULL);
 				
+				if (!BIGRAMHOLDER_CONTAINS(bigrams, word)) {
+					sendStringMessage(newsd, "\n\n");
+					continue;
+				}
+				
 				
 				printf("THREAD: rcvd 'G' GENERATE request with depth %d and breadth %d\n", depth, breadth);
 				

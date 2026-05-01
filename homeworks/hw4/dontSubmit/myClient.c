@@ -184,6 +184,8 @@ int main(int argc, char** argv)
   printf("Generating...\n");
   sendGenerateRequest(sd, 2, 7, "may");
   
+  sendGenerateRequest(sd, 10, 10, "NOTHING EVER");
+  
   sendShutdownRequest(sd);
 
   return EXIT_SUCCESS;
