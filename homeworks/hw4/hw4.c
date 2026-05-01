@@ -492,11 +492,10 @@ int appLayerProtocolInit(unsigned short port) {
 }
 
 void sendStringMessage(int newsd, str toSend) {
-	printf("%s\n%d\n", toSend, strlen(toSend));
 	// for (char* oneByte = toSend; *oneByte; ++oneByte) {
 	// 	send(newsd, oneByte, 1, 0);
 	// }
-	send(newsd, toSend, strlen(toSend) + 1, 0);
+	send(newsd, toSend, strlen(toSend), 0);
 }
 
 void* timerThread() {
@@ -513,12 +512,13 @@ pthread_t startTimerThread() {
 	return toReturn;
 }
 
-str addTwoNewlinesToEnd(str s) {
+str addThreeNewlinesToEnd(str s) {
 	int len = strlen(s);
-	str toReturn = calloc(len + 3, sizeof(char));
+	str toReturn = calloc(len + 4, sizeof(char));
 	strcpy(toReturn, s);
 	at(toReturn, len) = '\n';
 	at(toReturn, len + 1) = '\n';
+	at(toReturn, len + 2) = '\n';
 	return toReturn;
 }
 
@@ -539,7 +539,7 @@ str sentenceCollectionToString(LinkedList_LinkedList_str sentencesList) {
 	LinkedList__free(str, sentences);
 	
 	
-	str toReturn = addTwoNewlinesToEnd(toBeNewlineTailed);
+	str toReturn = addThreeNewlinesToEnd(toBeNewlineTailed);
 	
 	free(toBeNewlineTailed);
 	
