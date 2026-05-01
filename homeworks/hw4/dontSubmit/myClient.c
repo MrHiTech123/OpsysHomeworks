@@ -76,7 +76,7 @@ void sendGenerateRequest(int sd, short breadth, short depth, char* msg) {
 	    else /* n > 0 */
 	    {
 	      *(toSend + n) = '\0';
-	      printf( "CLIENT: rcvd from server: \n%s\n", toSend );
+	      printf( "CLIENT: rcvd %d bytes from server: \n%s\n", n, toSend );
 
 	      /* response must end in "\n\n" -- assuming we receive this in one recv() call */
 	      if ( n > 1 && *(toSend + n - 1) == '\n' && *(toSend + n - 2) == '\n' ) break;

@@ -559,10 +559,7 @@ void* appLayerProtocolThread(void* argsPtr) {
 				free(readData);
 				break;
 			case INSTRUCTION_TYPE_GENERATE:
-				short breadth, depth;
-				
-				BiGramHolder__display(bigrams);
-				
+				short breadth, depth;				
 				
 				ensureBytesReadOverNetwork(newsd, sizeof(short), &breadth);
 				breadth = ntohs(breadth);
