@@ -566,6 +566,9 @@ void* appLayerProtocolThread(void* argsPtr) {
 				ensureBytesReadOverNetwork(newsd, sizeof(short), &depth);
 				depth = ntohs(depth);
 				
+				#ifdef DISPLAY_BIGRAMS
+					BiGramHolder__display(bigrams);
+				#endif
 				
 				char* word = readWordFromFile(newsd, NULL);
 				
