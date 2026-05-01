@@ -3899,7 +3899,7 @@ void settings() {
 }
 
 
-char readOneChar(int fd) {
+char readOneCharFromFile(int fd) {
  char toReturn;
  int charactersRead = read(fd, &toReturn, 1);
  if (charactersRead == 0) {
@@ -3937,7 +3937,7 @@ char* readWordFromFile(int fd,
 
  int apostrophesRead = 0;
  while (1) {
-  char currentCharBeingRead = readOneChar(fd);
+  char currentCharBeingRead = readOneCharFromFile(fd);
 
   if (
 # 64 "hw4.c" 3 4

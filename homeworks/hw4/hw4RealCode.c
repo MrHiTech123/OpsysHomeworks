@@ -35,7 +35,7 @@ void settings() {
 }
 
 
-char readOneChar(int fd) {
+char readOneCharFromFile(int fd) {
 	char toReturn;
 	int charactersRead = read(fd, &toReturn, 1);
 	if (charactersRead == 0) {
@@ -67,7 +67,7 @@ char* readWordFromFile(int fd, bool* endOfFileFlag) {
 	
 	int apostrophesRead = 0;
 	while (1) {
-		char currentCharBeingRead = readOneChar(fd);
+		char currentCharBeingRead = readOneCharFromFile(fd);
 		
 		if (isalpha(currentCharBeingRead)) {
 			LinkedList__append(char, wordSoFar, currentCharBeingRead);

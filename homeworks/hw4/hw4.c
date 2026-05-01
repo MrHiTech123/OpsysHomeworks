@@ -329,13 +329,19 @@ void settings() {
 }
 
 
-char readOneChar(int fd) {
+char readOneCharFromFile(int fd) {
 	char toReturn;
 	int charactersRead = read(fd, &toReturn, 1);
 	if (charactersRead == 0) {
 		return '\0';
 	}
 	toReturn = tolower(toReturn);
+	return toReturn;
+}
+
+char readOneCharFromString(str* toReadFrom) {
+	char toReturn = **toReadFrom;
+	++*toReadFrom;
 	return toReturn;
 }
 
@@ -355,13 +361,97 @@ char* LinkedList_char__toString(LinkedList_char list) {
 	return toReturn;
 }
 
+char* readWordFromString(str* beingRead) {
+	LinkedList_char wordSoFar = LinkedList__create;
+	
+	int apostrophesRead = 0;
+	
+	// printf("%s\n", *beingRead);
+	
+	while (1) {
+		char currentChar = readOneCharFromString(beingRead);
+		if (isalpha(currentChar)) {
+			LinkedList__append(char, wordSoFar, currentChar);
+		}
+		else if (currentChar == APOSTROPHE) {
+			++apostrophesRead;
+			if (apostrophesRead > 1) {
+				break;
+			}
+			LinkedList__append(char, wordSoFar, currentChar);
+		}
+		else {
+			break;
+		}
+	}
+	
+	str toReturn = LinkedList_char__toString(wordSoFar);
+	LinkedList__free(char, wordSoFar);
+	
+	return toReturn;
+}
+
+LinkedList_str readAllWordsFromString(str string) {
+	LinkedList_str toReturn = LinkedList__create;
+	
+	printf("%s\n", string);
+	
+	
+	while (*string) {
+		str currentWord = readWordFromString(&string);
+		if (strlen(currentWord)) {
+			LinkedList__append(str, toReturn, currentWord);
+		}
+	}
+	
+	return toReturn;
+}
+
+
+#define READING_SIZE 10000
+size_t getLengthOfFile(str fileName) {
+	size_t toReturn = 0;
+	int fd = open(fileName, O_RDONLY);
+	char* buf = calloc(READING_SIZE, sizeof(char));
+	while (1) {
+		int n = read(fd, buf, READING_SIZE);
+		toReturn += n;
+		if (n == 0) {
+			break;
+		}
+	}
+	
+	free(buf);
+	close(fd);
+	
+	return toReturn;
+	
+}
+
+char* getContentsOfFile(str fileName) {
+	size_t length = getLengthOfFile(fileName);
+	
+	char* toReturn = calloc(length + 1, sizeof(char));
+	
+	int fd = open(fileName, O_RDONLY);
+	read(fd, toReturn, length);
+	close(fd);
+	return toReturn;
+}
+
+LinkedList_str readAllWordsFromFile(str fileName) {
+	str contents = getContentsOfFile(fileName);
+	LinkedList_str toReturn = readAllWordsFromString(contents);
+	free(contents);
+	return toReturn;
+}
 
 char* readWordFromFile(int fd, bool* endOfFileFlag) {
 	LinkedList_char wordSoFar = LinkedList__create;
 	
 	int apostrophesRead = 0;
 	while (1) {
-		char currentCharBeingRead = readOneChar(fd);
+		char currentCharBeingRead = readOneCharFromFile(fd);
 		
 		if (isalpha(currentCharBeingRead)) {
 			LinkedList__append(char, wordSoFar, currentCharBeingRead);
@@ -390,37 +480,25 @@ char* readWordFromFile(int fd, bool* endOfFileFlag) {
 	
 }
 
-LinkedList_str readAllWordsFromFile(int fd) {
-	LinkedList_str toReturn = LinkedList__create;
-	
-	bool reachedEndOfFile = false;
-	while (!reachedEndOfFile) {
-		str currentWord = readWordFromFile(fd, &reachedEndOfFile);
-		if (strlen(currentWord)) {
-			LinkedList__append(str, toReturn, currentWord);
-		}
-	}
-	
-	return toReturn;
-}
 
-LinkedList_str readAllWordsFromString(str content) {
-	int* filePipe = calloc(2, sizeof(int));
-	pipe(filePipe);
-	int readingEnd = at(filePipe, 0);
-	int writingEnd = at(filePipe, 1);
-	free(filePipe);
+
+// LinkedList_str readAllWordsFromString(str content) {
+// 	int* filePipe = calloc(2, sizeof(int));
+// 	pipe(filePipe);
+// 	int readingEnd = at(filePipe, 0);
+// 	int writingEnd = at(filePipe, 1);
+// 	free(filePipe);
 	
-	write(writingEnd, content, strlen(content) + 1);	
+// 	write(writingEnd, content, strlen(content) + 1);	
 	
-	LinkedList_str toReturn = readAllWordsFromFile(readingEnd);
+// 	LinkedList_str toReturn = readAllWordsFromFile(readingEnd);
 	
 	
-	close(readingEnd);
-	close(writingEnd);
+// 	close(readingEnd);
+// 	close(writingEnd);
 	
-	return toReturn;
-}
+// 	return toReturn;
+// }
 
 void freeAllStrings() {
 	LinkedList__foreach(str, toDelete, allStringsMarkedForFreeing) {
@@ -726,9 +804,10 @@ int main(int argc, char** argv)
 	settings();
 	str inputFileName = at(argv, 1);
 	unsigned short port = (unsigned short)atoi(at(argv, 2));
-	int inputFile = open(inputFileName, O_RDONLY);
 	
-	LinkedList_str words = readAllWordsFromFile(inputFile);
+	printf("%d\n", 1);
+	
+	LinkedList_str words = readAllWordsFromFile(inputFileName);
 	
 	BiGramHolder bigrams = BiGramHolder__create(words);
 	
