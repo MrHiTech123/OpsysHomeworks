@@ -68,7 +68,10 @@ void sendGenerateRequest(int sd, short breadth, short depth, char* msg) {
 	  do
 	  {
 		sleep(5);
-	    n = recv( sd, toSend, MAXBUFFER, 0 );
+		char* buf = calloc(MAXBUFFER + 1, sizeof(char));
+		
+		
+	    n = recv( sd, buf, MAXBUFFER, 0 );
 	    if ( n == -1 ) { perror( "recv() failed" ); return; }
 	    if ( n == 0 )
 	    {
@@ -76,11 +79,11 @@ void sendGenerateRequest(int sd, short breadth, short depth, char* msg) {
 	    }
 	    else /* n > 0 */
 	    {
-	      *(toSend + n) = '\0';
-	      printf( "CLIENT: rcvd %d bytes from server:\n%s", n, toSend);
+	      *(buf + n) = '\0';
+	      printf( "CLIENT: rcvd %d bytes from server:\n%s", n, buf);
 
 	      /* response must end in "\n\n" -- assuming we receive this in one recv() call */
-	      if ( n > 1 && *(toSend + n - 1) == '\n' && *(toSend + n - 2) == '\n' ) break;
+	      if ( n > 1 && *(buf + n - 1) == '\n' && *(buf + n - 2) == '\n' ) break;
 	    }
 	  }
 	  while ( n > 0 );
