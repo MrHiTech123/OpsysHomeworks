@@ -513,8 +513,8 @@ str addTwoNewlinesToEnd(str s) {
 	int len = strlen(s);
 	str toReturn = calloc(len + 3, sizeof(char));
 	strcpy(toReturn, s);
-	at(toReturn, len - 3) = '\n';
-	at(toReturn, len - 2) = '\n';
+	at(toReturn, len) = '\n';
+	at(toReturn, len + 1) = '\n';
 	return toReturn;
 }
 
