@@ -67,6 +67,7 @@ void sendGenerateRequest(int sd, short breadth, short depth, char* msg) {
 
 	  do
 	  {
+		sleep(5);
 	    n = recv( sd, toSend, MAXBUFFER, 0 );
 	    if ( n == -1 ) { perror( "recv() failed" ); return; }
 	    if ( n == 0 )
@@ -76,7 +77,7 @@ void sendGenerateRequest(int sd, short breadth, short depth, char* msg) {
 	    else /* n > 0 */
 	    {
 	      *(toSend + n) = '\0';
-	      printf( "CLIENT: rcvd %d bytes from server: \n%s\n", n, toSend );
+	      printf( "CLIENT: rcvd %d bytes from server:\n%s", n, toSend);
 
 	      /* response must end in "\n\n" -- assuming we receive this in one recv() call */
 	      if ( n > 1 && *(toSend + n - 1) == '\n' && *(toSend + n - 2) == '\n' ) break;

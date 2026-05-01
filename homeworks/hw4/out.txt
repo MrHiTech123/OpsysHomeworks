@@ -283,32 +283,7 @@ fables
 forward
 	in 1
 THREAD: rcvd 'G' GENERATE request with depth 7 and breadth 2
-may be able to carry him and
-may be able to carry him alive
-may be able to carry you a
-may be able to carry you forward
-may be able to a lion was
-may be able to a lion who
-may be able to a little mouse
-may be able to a little friends
-may carry him and down upon him
-may carry him and let him and
-may carry him and let him alive
-may carry him alive to carry him
-may carry him alive to carry you
-may carry him alive to a lion
-may carry him alive to a little
-may carry you a lion was asleep
-may carry you a lion was caught
-may carry you a lion who desired
-may carry you a lion who knows
-may carry you a little mouse began
-may carry you a little mouse being
-may carry you a little friends may
-may carry you forward in a lion
-may carry you forward in a little
-may carry you forward in life
+START_SENTENCE_COLLECTION
+
+END_SENTENCE_COLLECTION
 THREAD: sent response with 25 phrases
-THREAD: rcvd 'X' SHUTDOWN request
-THREAD: sent OK response
-MAIN: shutting down after confirming 0 child threads running

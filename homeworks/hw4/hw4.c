@@ -122,7 +122,7 @@ int BiGramHolder__getTimes(BiGramHolder holder, str firstWord, str secondWord) {
 	return LinkedMap__find(str, int, location, secondWord, equals_str);
 }
 
-str joinAll(LinkedList_str toJoin) {
+str joinAll(LinkedList_str toJoin, char toJoinWith) {
 	int listLen = LinkedList__length(str, toJoin);
 	int stringLen = listLen;
 	LinkedList__foreach(str, word, toJoin) {
@@ -135,7 +135,7 @@ str joinAll(LinkedList_str toJoin) {
 	LinkedList__foreach(str, word2, toJoin) {
 		strcpy(toReturn + currentIndex, word2);
 		currentIndex += strlen(word2);
-		*(toReturn + currentIndex) = ' ';
+		*(toReturn + currentIndex) = toJoinWith;
 		++currentIndex;
 	}
 	
@@ -257,7 +257,7 @@ LinkedList_LinkedList_str BiGramHolder__generateSentences(BiGramHolder holder, s
 
 void printSentenceCollection(LinkedList_LinkedList_str sentences) {
 	LinkedList__foreach (LinkedList_str, currentSentenceLinkedList, sentences) {
-		str sentence = joinAll(currentSentenceLinkedList);
+		str sentence = joinAll(currentSentenceLinkedList, ' ');
 		printf("%s\n", sentence);
 		free(sentence);
 	}
@@ -509,16 +509,57 @@ pthread_t startTimerThread() {
 	return toReturn;
 }
 
-void sendSentenceCollection(int newsd, LinkedList_LinkedList_str sentences) {
-	LinkedList__foreach (LinkedList_str, currentSentenceLinkedList, sentences) {
-		str sentence = joinAll(currentSentenceLinkedList);
-		sendStringMessage(newsd, sentence);
-		printf("%s\n", sentence);
-		sendStringMessage(newsd, "\n");
+str addTwoNewlinesToEnd(str s) {
+	int len = strlen(s);
+	str toReturn = calloc(len + 3, sizeof(char));
+	strcpy(toReturn, s);
+	at(toReturn, len - 3) = '\n';
+	at(toReturn, len - 2) = '\n';
+	return toReturn;
+}
+
+str sentenceCollectionToString(LinkedList_LinkedList_str sentencesList) {
+	LinkedList_str sentences = LinkedList__create;
+	
+	LinkedList__foreach(LinkedList_str, sentenceList, sentencesList) {
+		str sentence = joinAll(sentenceList, ' ');
+		LinkedList__append(str, sentences, sentence);
+	}
+	
+	str toBeNewlineTailed = joinAll(sentences, '\n');
+	
+	printf("%s\n", toBeNewlineTailed);
+	
+	LinkedList__foreach(str, sentence, sentences) {
 		free(sentence);
 	}
 	
-	sendStringMessage(newsd, "\n");
+	LinkedList__free(str, sentences);
+	
+	
+	str toReturn = addTwoNewlinesToEnd(toBeNewlineTailed);
+	
+	free(toBeNewlineTailed);
+	
+	return toReturn;
+	
+}
+
+void sendSentenceCollection(int newsd, LinkedList_LinkedList_str sentences) {
+	str toSend = sentenceCollectionToString(sentences);
+	printf("START_SENTENCE_COLLECTION\n%s\nEND_SENTENCE_COLLECTION\n", toSend);
+	sendStringMessage(newsd, toSend);
+	free(toSend);
+	
+	// LinkedList__foreach (LinkedList_str, currentSentenceLinkedList, sentences) {
+	// 	str sentence = joinAll(currentSentenceLinkedList, ' ');
+	// 	sendStringMessage(newsd, sentence);
+	// 	printf("%s\n", sentence);
+	// 	sendStringMessage(newsd, "\n");
+	// 	free(sentence);
+	// }
+	
+	// sendStringMessage(newsd, "\n");
 }
 
 void sendOKResponse(int newsd) {
@@ -560,7 +601,7 @@ void* appLayerProtocolThread(void* argsPtr) {
 				free(readData);
 				break;
 			case INSTRUCTION_TYPE_GENERATE:
-				short breadth, depth;				
+				short breadth, depth;
 				
 				ensureBytesReadOverNetwork(newsd, sizeof(short), &breadth);
 				breadth = ntohs(breadth);
