@@ -585,6 +585,9 @@ void* appLayerProtocolThread(void* argsPtr) {
 	int n = 1;
 	while (n > 0) {
 		char instructionType;
+		#ifdef DEBUG
+			printf("Reading\n");
+		#endif
 		n = recv(newsd, &instructionType, sizeof(char), 0);
 		switch (instructionType) {
 			case INSTRUCTION_TYPE_ADD:
@@ -620,15 +623,15 @@ void* appLayerProtocolThread(void* argsPtr) {
 				
 				char* word = readWordFromFile(newsd, NULL);
 				
-				if (!BIGRAMHOLDER_CONTAINS(bigrams, word)) {
-					sendStringMessage(newsd, "\n\n");
-					continue;
-				}
-				
-				
 				printf("THREAD: rcvd 'G' GENERATE request with depth %d and breadth %d\n", depth, breadth);
 				
+				
 				pthread_mutex_lock(&BIGRAM_HOLDER_MUTEX);
+					if (!BIGRAMHOLDER_CONTAINS(bigrams, word) || breadth == 0 || depth == 0) {
+						sendStringMessage(newsd, "\n\n");
+						pthread_mutex_unlock(&BIGRAM_HOLDER_MUTEX);
+						break;
+					}
 					LinkedList_LinkedList_str sentences = 
 						BiGramHolder__generateSentences(bigrams, word, breadth, depth);
 				pthread_mutex_unlock(&BIGRAM_HOLDER_MUTEX);

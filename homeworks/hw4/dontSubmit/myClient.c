@@ -60,14 +60,13 @@ void sendGenerateRequest(int sd, short breadth, short depth, char* msg) {
 	toSend[lengthOfMessage - 1] = '\n';
 	
 
-	  printf( "CLIENT: sending GENERATE request to server...\n" );
+	  printf( "CLIENT: sending GENERATE request to server... %d %d %s\n", breadth, depth, msg);
 	  int n = send( sd, toSend, lengthOfMessage, 0 );
 	                  /* ^ */
 	  if ( n == -1 ) { perror( "send() failed" ); return; }
 
 	  do
 	  {
-		sleep(5);
 		char* buf = calloc(MAXBUFFER + 1, sizeof(char));
 		
 		
@@ -182,9 +181,15 @@ int main(int argc, char** argv)
   printf("Sending requests!\n");
   sendAddRequest(sd, "Aesop's Fables may carry you forward in life!");
   printf("Generating...\n");
-  sendGenerateRequest(sd, 2, 7, "may");
+  sendGenerateRequest(sd, 2, 7, "is");
   
   sendGenerateRequest(sd, 10, 10, "NOTHING EVER");
+  
+  sendGenerateRequest(sd, 0, 0, "is");
+  sendGenerateRequest(sd, 2, 0, "is");
+  sendGenerateRequest(sd, 1, 0, "is");
+  sendGenerateRequest(sd, 10, 1, "is");
+  
   
   sendShutdownRequest(sd);
 
