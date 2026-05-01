@@ -491,7 +491,8 @@ int appLayerProtocolInit(unsigned short port) {
 	return listener;
 }
 
-void sendStringMessage(int newsd, str toSend) {				
+void sendStringMessage(int newsd, str toSend) {
+	printf("%s\n%d\n", toSend, strlen(toSend));
 	send(newsd, toSend, strlen(toSend), 0);
 }
 
@@ -527,9 +528,7 @@ str sentenceCollectionToString(LinkedList_LinkedList_str sentencesList) {
 	}
 	
 	str toBeNewlineTailed = joinAll(sentences, '\n');
-	
-	printf("%s\n", toBeNewlineTailed);
-	
+		
 	LinkedList__foreach(str, sentence, sentences) {
 		free(sentence);
 	}
@@ -547,7 +546,11 @@ str sentenceCollectionToString(LinkedList_LinkedList_str sentencesList) {
 
 void sendSentenceCollection(int newsd, LinkedList_LinkedList_str sentences) {
 	str toSend = sentenceCollectionToString(sentences);
-	printf("START_SENTENCE_COLLECTION\n%s\nEND_SENTENCE_COLLECTION\n", toSend);
+	
+	#ifdef DEBUG
+		printf("%s\n", toSend);
+	#endif
+	
 	sendStringMessage(newsd, toSend);
 	free(toSend);
 	
@@ -608,7 +611,10 @@ void* appLayerProtocolThread(void* argsPtr) {
 				ensureBytesReadOverNetwork(newsd, sizeof(short), &depth);
 				depth = ntohs(depth);
 				
-				#ifdef DISPLAY_BIGRAMS
+				
+				sendStringMessage(newsd, "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz\n");
+				exit(0);
+				#ifdef DEBUG
 					BiGramHolder__display(bigrams);
 				#endif
 				
