@@ -393,9 +393,7 @@ char* readWordFromString(str* beingRead) {
 
 LinkedList_str readAllWordsFromString(str string) {
 	LinkedList_str toReturn = LinkedList__create;
-	
-	printf("%s\n", string);
-	
+		
 	
 	while (*string) {
 		str currentWord = readWordFromString(&string);
@@ -804,9 +802,7 @@ int main(int argc, char** argv)
 	settings();
 	str inputFileName = at(argv, 1);
 	unsigned short port = (unsigned short)atoi(at(argv, 2));
-	
-	printf("%d\n", 1);
-	
+		
 	LinkedList_str words = readAllWordsFromFile(inputFileName);
 	
 	BiGramHolder bigrams = BiGramHolder__create(words);
