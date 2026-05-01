@@ -513,6 +513,7 @@ void sendSentenceCollection(int newsd, LinkedList_LinkedList_str sentences) {
 	LinkedList__foreach (LinkedList_str, currentSentenceLinkedList, sentences) {
 		str sentence = joinAll(currentSentenceLinkedList);
 		sendStringMessage(newsd, sentence);
+		printf("%s\n", sentence);
 		sendStringMessage(newsd, "\n");
 		free(sentence);
 	}
