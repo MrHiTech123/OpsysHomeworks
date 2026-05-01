@@ -548,24 +548,23 @@ str sentenceCollectionToString(LinkedList_LinkedList_str sentencesList) {
 }
 
 void sendSentenceCollection(int newsd, LinkedList_LinkedList_str sentences) {
-	str toSend = sentenceCollectionToString(sentences);
+	// str toSend = sentenceCollectionToString(sentences);
 	
-	#ifdef DEBUG
-		printf("%s\n", toSend);
-	#endif
+	// #ifdef DEBUG
+	// 	printf("%s\n", toSend);
+	// #endif
 	
-	sendStringMessage(newsd, toSend);
-	free(toSend);
+	// sendStringMessage(newsd, toSend);
+	// free(toSend);
 	
-	// LinkedList__foreach (LinkedList_str, currentSentenceLinkedList, sentences) {
-	// 	str sentence = joinAll(currentSentenceLinkedList, ' ');
-	// 	sendStringMessage(newsd, sentence);
-	// 	printf("%s\n", sentence);
-	// 	sendStringMessage(newsd, "\n");
-	// 	free(sentence);
-	// }
+	LinkedList__foreach (LinkedList_str, currentSentenceLinkedList, sentences) {
+		str sentence = joinAll(currentSentenceLinkedList, ' ');
+		sendStringMessage(newsd, sentence);
+		sendStringMessage(newsd, "\n");
+		free(sentence);
+	}
 	
-	// sendStringMessage(newsd, "\n");
+	sendStringMessage(newsd, "\n\n");
 }
 
 void sendOKResponse(int newsd) {
